@@ -1,8 +1,7 @@
 datasets
-pytorch
+torch
 pandas
-tiktoken
 tqdm
 fastapi
-BaseModel
+Pydantic
 transformers

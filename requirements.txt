@@ -1,0 +1,8 @@
+datasets
+pytorch
+pandas
+tiktoken
+tqdm
+fastapi
+BaseModel
+transformers

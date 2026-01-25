@@ -139,10 +139,14 @@ def generate(model, tokenizer, device,val_df):
     with torch.no_grad():
         outputs = model.generate(
             **inputs, 
+        #    max_new_tokens=40,
+        #    do_sample=True,      
+        #    top_p=0.9,
+        #    repetition_penalty=1.2, 
             max_new_tokens=40,
-            do_sample=True,      
-            top_p=0.9,
-            repetition_penalty=1.2, 
+            num_beams=5,            
+            early_stopping=True,    
+            no_repeat_ngram_size=2,
             pad_token_id=tokenizer.eos_token_id,
             eos_token_id=tokenizer.eos_token_id
         )

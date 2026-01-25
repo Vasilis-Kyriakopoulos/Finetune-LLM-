@@ -113,10 +113,17 @@ def custom_collate_fn(
 
     return inputs_tensor, targets_tensor
 
-def calculate_accuracy(logits, labels):
+def calculate_accuracy(logits, labels,ignore_index = -100):
     predictions = torch.argmax(logits, dim=-1) #(batch_size, sequence_length, vocab_size)
-    correct_predictions = (predictions == labels).float() # (batch_size, sequence_length)
-    return correct_predictions.mean().item()
+    mask = (labels != -100)
+
+    # Συγκρίνουμε προβλέψεις και labels μόνο όπου η μάσκα είναι True
+    correct_predictions = (predictions == labels) & mask
+    
+    # Accuracy = (σωστά tokens) / (συνολικά tokens χωρίς το padding)
+    accuracy = correct_predictions.sum().float() / mask.sum().float()
+    
+    return accuracy.item()
 
 def get_random_validation_diff(val_df):
     # Διαλέγουμε μια τυχαία γραμμή από το validation dataframe

@@ -2205,3 +2205,396 @@ ACTUAL MESSAGE: added missing string definition for sectionerror. Fixed MDL-
 [2026-01-25 22:15:32] ==================================================
 
 [2026-01-25 22:15:35] Checkpoint saved at step 44000
+[2026-01-25 22:18:46] 
+==================================================
+[2026-01-25 22:18:46] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:18:46] DIFF:
+FILE: src/Knp/DoctrineBehaviors/ORM/Loggable/LoggableListener.php
+@@ -100,7 +100,7 @@ class LoggableListener extends AbstractListener
+      * @param  ReflectionClass $reflClass
+      * @return boolean
+      */
+-    private function isEntitySupported(\ReflectionClass $reflClass)
++    protected function isEntitySupported(\ReflectionClass $reflClass)
+     {
+         return $this->getClassAnalyzer()->hasTrait($reflClass, 'Knp\DoctrineBehaviors\Model\Loggable\Loggable');
+     }
+[2026-01-25 22:18:46] 
+ACTUAL MESSAGE: Change isEntitySupported from private to protected
+[2026-01-25 22:18:46] GENERATED MESSAGE: [BUGFIX] Fixed typo in is entity supported method
+[2026-01-25 22:18:46] ==================================================
+
+[2026-01-25 22:18:50] Checkpoint saved at step 44500
+[2026-01-25 22:22:04] 
+==================================================
+[2026-01-25 22:22:04] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:22:04] DIFF:
+FILE: src/resources/messaging.js
+@@ -5,7 +5,7 @@ import EventEmitter from 'events'
+ import Ajv from 'ajv'
+ import cookieStorage from '../utils/cookieStorage'
+-const PROMPT_MESSAGE = 'I wish to start messaging on origin protocol.'
++const PROMPT_MESSAGE = 'I am ready to start messaging on Origin.'
+ const PROMPT_PUB_KEY = 'My public messaging key is: '
+ const MESSAGING_KEY = 'MK_'
+ const PUB_MESSAGING_SIG = 'PMS_'
+@@ -255,8 +255,8 @@ class Messaging {
+           this.events.emit('pending_conv', message.payload.key)
+           const remote_address = message.payload.key
+           this.initRoom(remote_address)
+-          // this is probably not needed
+-          // this.getConvo(remote_address)
++          // may be overkill but may help prevent 
++          this.getConvo(remote_address)
+         }
+       }
+     )
+[2026-01-25 22:22:04] 
+ACTUAL MESSAGE: Messaging Adjustments (#)
+* Bring back redundant request for room
+* Change initial message
+[2026-01-25 22:22:04] GENERATED MESSAGE: fix(message): fix typo (#)
+[2026-01-25 22:22:04] ==================================================
+
+[2026-01-25 22:22:08] Checkpoint saved at step 45000
+[2026-01-25 22:25:19] 
+==================================================
+[2026-01-25 22:25:19] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:25:19] DIFF:
+FILE: tensorboard/util/encoder_test.py
+@@ -33,7 +33,7 @@ class TensorFlowPngEncoderTest(tf.test.TestCase):
+         # assume it did the right thing. We trust the underlying
+         # `encode_png` op.
+         self.assertEqual(b"\x89PNG", data[:4])
+-        self.assertGreater(len(data), 128)
++        self.assertGreater(len(data), 125)
+     def test_invalid_non_numpy(self):
+         with self.assertRaisesRegex(ValueError, "must be a numpy array"):
+[2026-01-25 22:25:19] 
+ACTUAL MESSAGE: Fix brittle Zlib-dependent test (#)
+Tests that expect zlib to produce a particular bitstream for some input
+data are brittle, because the output of zlib is variable for different
+implementations and different tunings.
+We trust the underlying zlib `encode_png` op does the right thing if it
+has a valid PNG header and is of a reasonable size.
+[2026-01-25 22:25:19] GENERATED MESSAGE: [TASK] increase the number of tests for the encoder test.
+[2026-01-25 22:25:19] ==================================================
+
+[2026-01-25 22:25:24] Checkpoint saved at step 45500
+[2026-01-25 22:28:35] 
+==================================================
+[2026-01-25 22:28:35] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:28:35] DIFF:
+FILE: docs/conf.py
+@@ -50,7 +50,7 @@ master_doc = 'index'
+ # General information about the project.
+ project = u'CRUDlex'
+-copyright = u'2017, Philip Lehmann-Böhm'
++copyright = u'2018, Philip Lehmann-Böhm'
+ author = u'Philip Lehmann-Böhm'
+ # The version info for the project you're documenting, acts as replacement for
+[2026-01-25 22:28:35] 
+ACTUAL MESSAGE: updated the copyright year of the manual
+[2026-01-25 22:28:35] GENERATED MESSAGE: Update copyright to
+[2026-01-25 22:28:35] ==================================================
+
+[2026-01-25 22:28:39] Checkpoint saved at step 46000
+[2026-01-25 22:38:32] Summary Epoch 2: Train Loss: 0.1621| Train Accuracy: 0.0587        | Val Loss: 1.4399| Val Accuracy: 0.5259)| PPL: 4.2202
+[2026-01-25 22:38:35] >>> New best model saved!
+[2026-01-25 22:41:13] 
+==================================================
+[2026-01-25 22:41:13] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:41:13] DIFF:
+FILE: CHANGELOG.md
+@@ -1,5 +1,10 @@
+ # MediaWiki Changelog
++## Version 0.5.1
++
++* Added Table of Contents parsing based on sections: result is an OrderedDict
++* Fix issue where some sections are not pulled correctly
++
+ ## Version 0.5.0
+ * Add support for logging into the MediaWiki site [issue #59](
+FILE: mediawiki/mediawiki.py
+@@ -16,7 +16,7 @@ from .mediawikipage import (MediaWikiPage)
+ from .utilities import (memoize)
+ URL = '
+-VERSION = '0.5.0'
++VERSION = '0.5.1'
+ class MediaWiki(object):
+FILE: mediawiki/mediawikipage.py
+@@ -446,8 +446,17 @@ class MediaWikiPage(object):
+         try:
+             content = self.content
+             index = content.index(section) + len(section)
++
++            # ensure we have the full section header...
++            while True:
++                if content[index + 1] == '=':
++                    index += 1
++                else:
++                    break
+         except ValueError:
+             return None
++        except IndexError:
++            pass
+         try:
+             next_index = self.content.index('==', index)
+[2026-01-25 22:41:13] 
+ACTUAL MESSAGE: handle lower subsections better (#)
+[2026-01-25 22:41:13] GENERATED MESSAGE: Fix bug where section headers were not being parsed correctly
+[2026-01-25 22:41:13] ==================================================
+
+[2026-01-25 22:41:16] Checkpoint saved at step 46500
+[2026-01-25 22:44:29] 
+==================================================
+[2026-01-25 22:44:29] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:44:29] DIFF:
+FILE: src/test/java/de/is24/util/monitoring/JMXTestHelper.java
+@@ -60,6 +60,20 @@ public class JMXTestHelper {
+   }
++  public static Long getCounterValue(String domain, String counterName) {
++    try {
++      ObjectName objectName = new ObjectName(domain + ":name=InApplicationMonitor");
++
++      Long result = (Long) platformMBeanServer.getAttribute(objectName, counterName);
++      return result;
++
++    } catch (Exception e) {
++      LOGGER.warn("oops", e);
++      throw new RuntimeException(e);
++    }
++
++  }
++
+   public static MBeanInfo getTimerMBeanInfo(String timerKey) {
+     try {
+@@ -74,5 +88,4 @@ public class JMXTestHelper {
+   }
+-
+ }
+[2026-01-25 22:44:29] 
+ACTUAL MESSAGE: Helper method to check for counters in JMX
+[2026-01-25 22:44:29] GENERATED MESSAGE: added test for counter value being null
+[2026-01-25 22:44:29] ==================================================
+
+[2026-01-25 22:44:33] Checkpoint saved at step 47000
+[2026-01-25 22:47:42] 
+==================================================
+[2026-01-25 22:47:42] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:47:42] DIFF:
+FILE: pkg/kubelet/kubelet.go
+@@ -914,7 +914,9 @@ func (kl *Kubelet) initializeModules() error {
+ // initializeRuntimeDependentModules will initialize internal modules that require the container runtime to be up.
+ func (kl *Kubelet) initializeRuntimeDependentModules() {
+ 	if err := kl.cadvisor.Start(); err != nil {
+-		kl.runtimeState.setInternalError(fmt.Errorf("failed to start cAdvisor %v", err))
++		// Fail kubelet and rely on the babysitter to retry starting kubelet.
++		// TODO(random-liu): Add backoff logic in the babysitter
++		glog.Fatalf("Failed to start cAdvisor %v", err)
+ 	}
+ 	// eviction manager must start after cadvisor because it needs to know if the container runtime has a dedicated imagefs
+ 	if err := kl.evictionManager.Start(kl, kl.getActivePods, evictionMonitoringPeriod); err != nil {
+[2026-01-25 22:47:42] 
+ACTUAL MESSAGE: Fail kubelet if cadvisor is not started.
+[2026-01-25 22:47:42] GENERATED MESSAGE: Fix typo in comment about failing kubernetes.
+[2026-01-25 22:47:42] ==================================================
+
+[2026-01-25 22:47:45] Checkpoint saved at step 47500
+[2026-01-25 22:50:56] 
+==================================================
+[2026-01-25 22:50:56] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:50:56] DIFF:
+FILE: Tests/Functional/ApiPlatformTest.php
+@@ -62,13 +62,13 @@ final class ApiPlatformTest extends FunctionalTestCase
+         self::assertEquals('[]', $client->getResponse()->getContent());
+     }
+-    public function testWithValidConditionArray()
++    public function testWithValidConditionJson()
+     {
+         $client = self::newClient(['config' => 'api_platform.yml']);
+         $client->request(
+             'GET',
+             '/books.json',
+-            ['search' => ['fields' => ['title' => ['single-values' => ['Symfony;']]]]]
++            ['search' => '{"fields":{"title":{"single-values":["Symfony;"]}}}']
+         );
+         self::assertFalse($client->getResponse()->isRedirection());
+[2026-01-25 22:50:56] 
+ACTUAL MESSAGE: [ApiPlatform] Remove support for Array input
+[2026-01-25 22:50:56] GENERATED MESSAGE: Fix test with valid condition json
+[2026-01-25 22:50:56] ==================================================
+
+[2026-01-25 22:51:00] Checkpoint saved at step 48000
+[2026-01-25 22:54:12] 
+==================================================
+[2026-01-25 22:54:12] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:54:12] DIFF:
+FILE: tower_cli/resources/setting.py
+@@ -151,6 +151,9 @@ class Resource(models.Resource):
+             return json.loads(value)
+         r = client.options(self.endpoint)
+         to_type = r.json()['actions']['PUT'].get(key, {}).get('type')
++        if to_type is None:
++            raise exc.TowerCLIError('You are trying to modify the value of a '
++                                    'Read-Only Field, which is not allowed')
+         if to_type == 'integer':
+             if value != 'null':
+                 return int(value)
+[2026-01-25 22:54:12] 
+ACTUAL MESSAGE: checking if the field is read-only before trying to modify it
+[2026-01-25 22:54:12] GENERATED MESSAGE: raise exception when reading from a read-only field
+[2026-01-25 22:54:12] ==================================================
+
+[2026-01-25 22:54:16] Checkpoint saved at step 48500
+[2026-01-25 22:57:26] 
+==================================================
+[2026-01-25 22:57:26] TEST ON RANDOM VAL DIFF:
+[2026-01-25 22:57:26] DIFF:
+FILE: test/src/com/socialize/test/integration/services/b/ViewUtilsTest.java
+@@ -31,7 +31,6 @@ import com.socialize.entity.View;
+ import com.socialize.error.SocializeException;
+ import com.socialize.listener.entity.EntityGetListener;
+ import com.socialize.listener.view.ViewAddListener;
+-import com.socialize.listener.view.ViewGetListener;
+ import com.socialize.test.SocializeActivityTest;
+ import com.socialize.test.ui.util.TestUtils;
+@@ -135,20 +134,7 @@ public class ViewUtilsTest extends SocializeActivityTest {
+ 			@Override
+ 			public void onCreate(View view) {
+-				ViewUtils.getView(TestUtils.getActivity(ViewUtilsTest.this), view.getId(), new ViewGetListener() {
+-					
+-					@Override
+-					public void onGet(View entity) {
+-						addResult(0, entity);
+-						latch.countDown();
+-					}
+-					
+-					@Override
+-					public void onError(SocializeException error) {
+-						error.printStackTrace();
+-						latch.countDown();
+-					}
+-				});
++				addResult(0, view);
+ 			}
+ 		});
+[2026-01-25 22:57:26] 
+ACTUAL MESSAGE: Removed view getter methods from SDK
+[2026-01-25 22:57:26] GENERATED MESSAGE: Removed unused imports from test.
+[2026-01-25 22:57:26] ==================================================
+
+[2026-01-25 22:57:30] Checkpoint saved at step 49000
+[2026-01-25 23:00:43] 
+==================================================
+[2026-01-25 23:00:43] TEST ON RANDOM VAL DIFF:
+[2026-01-25 23:00:43] DIFF:
+FILE: assets/js/log.js
+@@ -254,6 +254,7 @@
+ 		var level = levels[i];
+ 		var fn = console[level] || noop;
+ 		(function(level) {
++      var pending;
+       var wFn = wConsole[level] = function() {
+         var result = [];
+ 				for (var i = 0, len = arguments.length; i < len; i++) {
+@@ -262,8 +263,13 @@
+ 				addLog(level, result.join(' '));
+       };
+ 			console[level] = function() {
++        if (pending) {
++          return;
++        }
++        pending = true;
+         wFn.apply(null, arguments);
+-				fn.apply(this, arguments);
++        fn.apply(this, arguments);
++        pending = false;
+ 			};
+ 		})(level);
+   }
+[2026-01-25 23:00:43] 
+ACTUAL MESSAGE: refactor: Prevent recursive calls
+[2026-01-25 23:00:43] GENERATED MESSAGE: fix(log): check for pending before calling fn
+[2026-01-25 23:00:43] ==================================================
+
+[2026-01-25 23:00:47] Checkpoint saved at step 49500
+[2026-01-25 23:03:55] 
+==================================================
+[2026-01-25 23:03:55] TEST ON RANDOM VAL DIFF:
+[2026-01-25 23:03:55] DIFF:
+FILE: build/ensure-sizzle.js
+@@ -1,7 +1,7 @@
+ var fs = require( "fs" ),
+ 	npm = require( "npm" ),
+ 	sizzleLoc = __dirname + "/../external/sizzle/dist/sizzle.js",
+-	rversion = /Engine v(\d+\.\d+\.\d+[-\.\d\w]*)/;
++	rversion = /Engine v(\d+\.\d+\.\d+(?:-[-\.\d\w]+)?)/;
+ require( "colors" );
+[2026-01-25 23:03:55] 
+ACTUAL MESSAGE: Build: Sizzle version labels must start with a dash
+[2026-01-25 23:03:55] GENERATED MESSAGE: fix(build): fix typo in sizzle build
+[2026-01-25 23:03:55] ==================================================
+
+[2026-01-25 23:04:00] Checkpoint saved at step 50000
+[2026-01-25 23:07:09] 
+==================================================
+[2026-01-25 23:07:09] TEST ON RANDOM VAL DIFF:
+[2026-01-25 23:07:09] DIFF:
+FILE: lib/specinfra/backend/powershell/script_helper.rb
+@@ -8,7 +8,7 @@ module Specinfra
+           path = get_config(:path)
+           if path
+             cmd.strip!
+-            cmd = 
++            cmd =
+ <<-EOF
+ $env:path = "#{path};$env:path"
+ #{cmd}
+@@ -21,12 +21,10 @@ EOF
+           path = get_config(:path)
+           if get_config(:pre_command)
+             cmd.strip!
+-            cmd = 
++            cmd =
+ <<-EOF
+-if (#{get_config(:pre_command)})
+-{
++#{get_config(:pre_command)}
+ #{cmd}
+-}
+ EOF
+             cmd = "$env:path = \"#{path};$env:path\"\n#{cmd}" if path
+           end
+[2026-01-25 23:07:09] 
+ACTUAL MESSAGE: Do not make the pre_command a conditional
+[2026-01-25 23:07:09] GENERATED MESSAGE: Fixing a bug in the script helper.
+[2026-01-25 23:07:09] ==================================================
+
+[2026-01-25 23:07:13] Checkpoint saved at step 50500
+[2026-01-25 23:10:23] 
+==================================================
+[2026-01-25 23:10:23] TEST ON RANDOM VAL DIFF:
+[2026-01-25 23:10:23] DIFF:
+FILE: src/java/com/threerings/jme/JmeApp.java
+@@ -93,8 +93,8 @@ public class JmeApp
+             // create an appropriate timer
+             _timer = Timer.getTimer(_api);
+-            // start with a target of 60 frames per second
+-            setTargetFPS(60);
++            // start with the target FPS equal to the refresh rate
++            setTargetFPS(_display.getFrequency());
+             // initialize our main camera controls and user input handling
+             initInput();
+[2026-01-25 23:10:23] 
+ACTUAL MESSAGE: Instead of , try using the refresh rate as the target FPS.
+git-svn-id: svn+ssh://src.earth.threerings.net/narya/trunk@ f4-e9--aa3c-eee0fcfb1
+[2026-01-25 23:10:23] GENERATED MESSAGE: Update jme.js app.
+[2026-01-25 23:10:23] ==================================================
+
+[2026-01-25 23:10:27] Checkpoint saved at step 51000
+[2026-01-25 23:15:28] Loading tokenized data from cache...
+[2026-01-25 23:16:15] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 23:16:19] Resuming from Epoch 3, Global Step 51000
+[2026-01-25 23:16:19] Resuming with Best Val Loss = 1.4399
+[2026-01-25 23:16:19] Resuming with number of bad epochs = 0.0000

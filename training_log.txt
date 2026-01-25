@@ -1,0 +1,1602 @@
+[2026-01-24 15:47:45] Length Train:116521
+[2026-01-24 15:47:45] Length Val:24969
+[2026-01-24 15:47:45] New Length Train: 92181
+[2026-01-24 15:47:45] New Length Val: 19706
+[2026-01-24 15:47:46] Loading checkpoint: latest_checkpoint.pt
+[2026-01-24 15:47:47] Resuming from Epoch 0, Global Step 500
+[2026-01-24 15:50:53] 
+==================================================
+[2026-01-24 15:50:53] TEST ON RANDOM VAL DIFF:
+[2026-01-24 15:50:53] DIFF:
+FILE: actor-sdk/sdk-core/core/core-shared/src/main/java/im/actor/core/modules/messaging/router/RouterActor.java
+@@ -557,7 +557,7 @@ public class RouterActor extends ModuleActor {
+         updateChatState(peer);
+-        return getDialogsRouter().onChatDelete(peer);
++        return getDialogsRouter().onChatDelete(peer).chain(aVoid -> onChatDropCache(peer));
+     }
+[2026-01-24 15:50:53] 
+ACTUAL MESSAGE: fix(android): drop group cache after delete
+[2026-01-24 15:50:53] GENERATED MESSAGE: set caller callbacks to the right calls that will be triggered when a conversation is closed via this feature as well (not implemented in code) fixed broken commit for routing action only and do not throw exception
+[2026-01-24 15:50:53] ==================================================
+
+[2026-01-24 15:50:58] Checkpoint saved at step 1000
+[2026-01-24 15:54:03] 
+==================================================
+[2026-01-24 15:54:03] TEST ON RANDOM VAL DIFF:
+[2026-01-24 15:54:03] DIFF:
+FILE: core/src/main/java/hudson/util/ChartUtil.java
+@@ -89,7 +89,7 @@ public class ChartUtil {
+         ChartRenderingInfo info = new ChartRenderingInfo();
+         chart.createBufferedImage(Integer.parseInt(w),Integer.parseInt(h),info);
+-        rsp.setContentType("text/html;charset=UTF-8");
++        rsp.setContentType("text/plain;charset=UTF-8");
+         rsp.getWriter().println(ChartUtilities.getImageMap( "map", info ));
+     }
+[2026-01-24 15:54:03] 
+ACTUAL MESSAGE: text/plain will make the debugging easier as you won't have to go to the source view.
+git-svn-id: <URL>
+[2026-01-24 15:54:03] GENERATED MESSAGE: Improvement to save memory when converting a map from ints into float fields (see section below) by adding the ability for struct types instead of array type as previously shown here (#). I'll keep
+[2026-01-24 15:54:03] ==================================================
+
+[2026-01-24 15:54:07] Checkpoint saved at step 1500
+[2026-01-24 15:57:12] 
+==================================================
+[2026-01-24 15:57:12] TEST ON RANDOM VAL DIFF:
+[2026-01-24 15:57:12] DIFF:
+FILE: core/src/main/java/org/mapfish/print/map/style/json/JsonStyleParserHelper.java
+@@ -118,7 +118,7 @@ public final class JsonStyleParserHelper {
+     @Nullable
+     public PointSymbolizer createPointSymbolizer(final PJsonObject styleJson) {
+-        if (!(styleJson.has(JSON_EXTERNAL_GRAPHIC) | styleJson.has(JSON_GRAPHIC_NAME))) {
++        if (!(styleJson.has(JSON_EXTERNAL_GRAPHIC) || styleJson.has(JSON_GRAPHIC_NAME))) {
+             return null;
+         }
+[2026-01-24 15:57:12] 
+ACTUAL MESSAGE: Fixed findbugs violation. There was a | instead of ||
+[2026-01-24 15:57:12] GENERATED MESSAGE: Updated JSON format formatting method to match a given Style annotation (#). Fix issue with existing formats being broken when comparing the styles for annotations of this type (as well as those used in other languages such from
+[2026-01-24 15:57:12] ==================================================
+
+[2026-01-24 15:57:17] Checkpoint saved at step 2000
+[2026-01-24 16:00:23] 
+==================================================
+[2026-01-24 16:00:23] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:00:23] DIFF:
+FILE: lib/jss/api_object/distribution_point.rb
+@@ -484,6 +484,7 @@ module JSS
+     def unmount
+       return nil unless mounted?
+       if system "/sbin/umount '#{@mountpoint}'"
++        sleep 1 # the umount takes time.
+         @mountpoint.rmdir if @mountpoint.directory? and (not @mountpoint.mountpoint?)
+         @mounted = false
+       else
+[2026-01-24 16:00:23] 
+ACTUAL MESSAGE: distribution_point.rb:DistributionPoint#unmount: sleep to allow system to do unmount
+[2026-01-24 16:00:23] GENERATED MESSAGE: fixing for `unset' failing on i386 systems with root partition manager running as initfs... I had to remove it from systemd by removing a mount point that was already being removed without attempting
+[2026-01-24 16:00:23] ==================================================
+
+[2026-01-24 16:00:27] Checkpoint saved at step 2500
+[2026-01-24 16:03:34] 
+==================================================
+[2026-01-24 16:03:34] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:03:34] DIFF:
+FILE: python/setup.py
+@@ -47,7 +47,7 @@ setup(
+     author="Kelly Boothby",
+     author_email="boothby@dwavesys.com",
+     url="
+-    version="0.1.0.dev4",
++    version="0.1.0.dev5",
+     licence="Apache 2.0",
+     ext_modules=cythonize(Extension(
+         name="minorminer",
+[2026-01-24 16:03:34] 
+ACTUAL MESSAGE: Update version .dev4 -> .dev5
+[2026-01-24 16:03:34] GENERATED MESSAGE: Fix #ifdefs for the new Minorminer license (#) This is a hardcoded codebase and this repo will be removed without issue if we do not rehash (in which case make
+[2026-01-24 16:03:34] ==================================================
+
+[2026-01-24 16:03:38] Checkpoint saved at step 3000
+[2026-01-24 16:06:42] 
+==================================================
+[2026-01-24 16:06:42] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:06:42] DIFF:
+FILE: lib/compass.js
+@@ -19,7 +19,9 @@ var spawn = require('child_process').spawn,
+         logging: true,
+         load_all: false,
+         project: process.cwd(),
+-        bundle_exec: false
++        bundle_exec: false,
++        debug: false,
++        time: false
+     },
+     isArray = Array.isArray || function(obj) {
+         return Object.prototype.toString.call(obj) === '[object Array]';
+@@ -70,6 +72,8 @@ module.exports = function(file, opts, callback) {
+     } else {
+         if (!opts.comments) { options.push('--no-line-comments'); }
+         if (opts.relative) { options.push('--relative-assets'); }
++        if (opts.debug) { options.push('--debug-info'); }
++        if (opts.time) { options.push('--time'); }
+         options.push('--output-style', opts.style);
+         options.push('--css-dir', opts.css);
+         options.push('--sass-dir', opts.sass);
+[2026-01-24 16:06:42] 
+ACTUAL MESSAGE: Added options
+Added options for debug info and compile time output
+[2026-01-24 16:06:42] GENERATED MESSAGE: Do not use @src and './dist': as src path in compass compilation tree of compiled files on macOS (#). It looks like the error when compiling locally that caused it to raise an exception
+[2026-01-24 16:06:42] ==================================================
+
+[2026-01-24 16:06:47] Checkpoint saved at step 3500
+[2026-01-24 16:09:52] 
+==================================================
+[2026-01-24 16:09:52] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:09:52] DIFF:
+FILE: lib/locallib.php
+@@ -175,6 +175,12 @@ function upgrade_local_db($continueto) {
+         upgrade_log_start();
+         notify('WARNING!!!  The local version you are using is OLDER than the version that made these databases!');
+     }
++
++    /// Capabilities
++    if (!update_capabilities('local')) {
++        error('Could not set up the capabilities for local!');
++    }
++
+     upgrade_log_finish();
+ }
+[2026-01-24 16:09:52] 
+ACTUAL MESSAGE: MDL- minor fix merged from MOODLE__STABLE
+[2026-01-24 16:09:52] GENERATED MESSAGE: Update database status to correct changes in setup process and report errors (#). No more weird 'cancel progress'. Fixes # issue with existing installation of localfloss2 from .gitignore (with no
+[2026-01-24 16:09:52] ==================================================
+
+[2026-01-24 16:09:56] Checkpoint saved at step 4000
+[2026-01-24 16:13:04] 
+==================================================
+[2026-01-24 16:13:04] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:13:04] DIFF:
+FILE: sentinel.go
+@@ -164,6 +164,14 @@ func (c *SentinelClient) Sentinels(name string) *SliceCmd {
+ 	return cmd
+ }
++// Failover forces a failover as if the master was not reachable, and without
++// asking for agreement to other Sentinels.
++func (c *SentinelClient) Failover(name string) *StatusCmd {
++	cmd := NewStatusCmd("sentinel", "failover", name)
++	c.Process(cmd)
++	return cmd
++}
++
+ type sentinelFailover struct {
+ 	sentinelAddrs []string
+[2026-01-24 16:13:04] 
+ACTUAL MESSAGE: Add the failover sentinel command
+[2026-01-24 16:13:04] GENERATED MESSAGE: Sending sendlers in sync with Slices (#). Fixes # on Twitter @Lyle_Tyrant :)#*[](git://github.'/lyle-toric/)‍
+[2026-01-24 16:13:04] ==================================================
+
+[2026-01-24 16:13:06] Checkpoint saved at step 4500
+[2026-01-24 16:16:12] 
+==================================================
+[2026-01-24 16:16:12] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:16:12] DIFF:
+FILE: peewee_validates.py
+@@ -1,7 +1,7 @@
+ from collections import namedtuple
+ from copy import deepcopy
+ from decimal import Decimal
+-from inspect import isclass
++import datetime as dt
+ import re
+ from dateutil.parser import parse as dateutil_parse
+@@ -32,14 +32,20 @@ class ValidationError(Exception):
+ def date(v):
++    if isinstance(v, dt.date):
++        return v
+     return dateutil_parse(v).date()
+ def time(v):
++    if isinstance(v, dt.time):
++        return v
+     return dateutil_parse(v).time()
+ def datetime(v):
++    if isinstance(v, dt.datetime):
++        return v
+     return dateutil_parse(v)
+[2026-01-24 16:16:12] 
+ACTUAL MESSAGE: Fixed issue with date/time parsing.
+[2026-01-24 16:16:12] GENERATED MESSAGE: [Update patch] Fix DateTime for default value not supported by the server (#)(https://github._mdn_releases.org/) and should only be used in django3 on Open
+[2026-01-24 16:16:12] ==================================================
+
+[2026-01-24 16:16:16] Checkpoint saved at step 5000
+[2026-01-24 16:19:21] 
+==================================================
+[2026-01-24 16:19:21] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:19:21] DIFF:
+FILE: lib/sessions.js
+@@ -82,6 +82,8 @@ class ServerSession {
+    * @param {*} sessionTimeoutMinutes
+    */
+   hasTimedOut(sessionTimeoutMinutes) {
++    // Take the difference of the lastUse timestamp and now, which will result in a value in
++    // milliseconds, and then convert milliseconds to minutes to compare to `sessionTimeoutMinutes`
+     const idleTimeMinutes = Math.round(
+       (((Date.now() - this.lastUse) % 86400000) % 3600000) / 60000
+     );
+[2026-01-24 16:19:21] 
+ACTUAL MESSAGE: doc(sessions): document about magic constants for ms conversion
+NODE-
+[2026-01-24 16:19:21] GENERATED MESSAGE: Make Session._timeoutMinuted work faster by setting this property (on the server side). Also remove unused function from _timeoutMinute because we can also use it on client-side events like logging
+[2026-01-24 16:19:21] ==================================================
+
+[2026-01-24 16:19:25] Checkpoint saved at step 5500
+[2026-01-24 16:22:34] 
+==================================================
+[2026-01-24 16:22:34] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:22:34] DIFF:
+FILE: pandas/core/series.py
+@@ -1472,6 +1472,10 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
+         str
+             {klass} in Markdown-friendly format.
++        Notes
++        -----
++        Requires the `tabulate < package.
++
+         Examples
+         --------
+         >>> s = pd.Series(["elk", "pig", "dog", "quetzal"], name="animal")
+[2026-01-24 16:22:34] 
+ACTUAL MESSAGE: DOC: Update dependency for to_markdown documentation (#)
+* Update to_markdown documentation
+Adding to the documentation that tabulate is required for to_markdown to be executed
+* Move the optional dependency to a note
+* Update series.py
+* Update series.py
+* Update pandas/core/series.py
+[2026-01-24 16:22:34] GENERATED MESSAGE: Fix bug where the series with the names of only tags was being used instead and that doesn't work now (was just a typo) (#1260). Also fixes related to missing markups for all
+[2026-01-24 16:22:34] ==================================================
+
+[2026-01-24 16:22:38] Checkpoint saved at step 6000
+[2026-01-24 16:25:43] 
+==================================================
+[2026-01-24 16:25:43] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:25:43] DIFF:
+FILE: setup.py
+@@ -27,7 +27,7 @@ tests_require = [
+     "nose-focus",
+     "colorama",
+     "numpy",
+-    "scipy==0.16.1",
++    "scipy>=0.16.1",
+     "flake8",
+     "yanc",
+     "remotecv",
+[2026-01-24 16:25:43] 
+ACTUAL MESSAGE: Relax scipy version requirement
+I don't see why it should be that restrictive. The current
+pinning makes packaging Thumbor needlessly difficult.
+[2026-01-24 16:25:43] GENERATED MESSAGE: Allow numpy as it currently supports # with alpha branch and will no longer be supported unless you set it to 0.18 by default! (#)
+[2026-01-24 16:25:43] ==================================================
+
+[2026-01-24 16:25:47] Checkpoint saved at step 6500
+[2026-01-24 16:28:51] 
+==================================================
+[2026-01-24 16:28:51] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:28:51] DIFF:
+FILE: flake8_import_order/__init__.py
+@@ -241,7 +241,9 @@ class ImportOrderChecker(object):
+                 cmp_n = n
+             if cmp_n[-1] and not is_sorted(cmp_n[-1]):
+-                should_be = ", ".join(name[0] for name in sorted(n[-1]))
++                should_be = ", ".join(
++                    name[0] for name in
++                    sorted(n[-1], key=lambda s: s[0].lower()))
+                 yield self.error(
+                     node, "I101",
+                     (
+[2026-01-24 16:28:51] 
+ACTUAL MESSAGE: fix Imported names order warning with google style
+using the following import:
+```python
+from .models import (
+    A,
+    C,
+    b,
+)
+```
+I would get this message:
+```
+I Imported names are in the wrong order. Should be A, C, b
+```
+This happened because the comparison that the plugin does is
+correct (lexicographic, case-insensitive). But when the error message is
+displayed, only a lexicographic case-sensitive sorting algorithm is
+used (python's default sorted)
+[2026-01-24 16:28:51] GENERATED MESSAGE: Import OrderCheckers are required only by the package manager so we shouldn't require them here as they have no dependencies on the library libs that come with them. (#)
+Fixed a typo when
+[2026-01-24 16:28:51] ==================================================
+
+[2026-01-24 16:28:55] Checkpoint saved at step 7000
+[2026-01-24 16:32:01] 
+==================================================
+[2026-01-24 16:32:01] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:32:01] DIFF:
+FILE: src/geo/LatLng.js
+@@ -40,5 +40,19 @@ L.LatLng.prototype = {
+ 		return 'LatLng(' +
+ 				L.Util.formatNum(this.lat) + ', ' +
+ 				L.Util.formatNum(this.lng) + ')';
++	},
++
++	// Haversine distance formula, see 
++	distanceTo: function (/*LatLng*/ that)/*->Double*/ {
++		var R = 6378137; // earth radius in meters
++		var dLat = (that.lat - this.lat) * L.LatLng.DEG_TO_RAD;
++		var dLon = (that.lng - this.lng) * L.LatLng.DEG_TO_RAD;
++		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
++			Math.sin(dLon / 2) * Math.sin(dLon / 2) *
++			Math.cos(this.lat * L.LatLng.DEG_TO_RAD) *
++			Math.cos(that.lat * L.LatLng.DEG_TO_RAD);
++		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
++		var d = R * c;
++		return d;
+ 	}
+ };
+[2026-01-24 16:32:01] 
+ACTUAL MESSAGE: Haversine distance formula for getting distance (in meters) between two LatLngs
+[2026-01-24 16:32:01] GENERATED MESSAGE: Fixed LRT issue of lat translation by removing negative angle values from the equation while correcting this problem through to the lt interpolation method (#6). The same is not true for ellipses and
+[2026-01-24 16:32:01] ==================================================
+
+[2026-01-24 16:32:05] Checkpoint saved at step 7500
+[2026-01-24 16:35:08] 
+==================================================
+[2026-01-24 16:35:08] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:35:08] DIFF:
+FILE: readmore.js
+@@ -113,9 +113,10 @@
+       // Fire beforeToggle callback
+       $this.options.beforeToggle(trigger, element, more);
+-      $(element).animate({"height": newHeight}, {duration: $this.options.speed }, function() {
+-        // Fire afterToggle callback
+-        $this.options.afterToggle(trigger, element, more);
++      $(element).animate({"height": newHeight}, {duration: $this.options.speed, complete: function() {
++          // Fire afterToggle callback
++          $this.options.afterToggle(trigger, element, more);
++        }
+       });
+       $(trigger).replaceWith($($this.options[newLink]).on('click', function(event) { $this.toggleSlider(this, element, event) }).addClass('readmore-js-toggle'));
+[2026-01-24 16:35:08] 
+ACTUAL MESSAGE: Update readmore.js
+Properly setup the animate complete option.
+[2026-01-24 16:35:08] GENERATED MESSAGE: added a check for 'clear' in following methods on click
+[2026-01-24 16:35:08] ==================================================
+
+[2026-01-24 16:35:12] Checkpoint saved at step 8000
+[2026-01-24 16:38:18] 
+==================================================
+[2026-01-24 16:38:18] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:38:18] DIFF:
+FILE: ml-agents/setup.py
+@@ -33,7 +33,7 @@ setup(
+         'matplotlib',
+         'numpy>=1.13.3,<=1.14.5',
+         'jupyter',
+-        'pytest>=3.2.2',
++        'pytest>=3.2.2,<4.0.0',
+         'docopt',
+         'pyyaml',
+         'protobuf>=3.6,<3.7',
+[2026-01-24 16:38:18] 
+ACTUAL MESSAGE: Limit pytest <
+Some of our tests fail with the new pytest .x versions because of
+a change to how fixtures work. Since these versions are the latest
+release in PyPI now, unit tests will fail on a fresh install.
+This change limits the version range in setup.py to fix the issue
+until we can make a decision about upgrading.
+[2026-01-24 16:38:18] GENERATED MESSAGE: Added docs on the pytest release (#)
+* Fixes a typo in `pytest` which broke a test that would otherwise run --only (see #).
+[2026-01-24 16:38:18] ==================================================
+
+[2026-01-24 16:38:22] Checkpoint saved at step 8500
+[2026-01-24 16:41:26] 
+==================================================
+[2026-01-24 16:41:26] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:41:26] DIFF:
+FILE: salt/runners/state.py
+@@ -119,6 +119,8 @@ def event(tagmatch='*', count=1, quiet=False, sock_dir=None):
+     '''
+     Watch Salt's event bus and block until the given tag is matched
++    .. versionadded:: Helium
++
+     This is useful for taking some simple action after an event is fired via
+     the CLI without having to use Salt's Reactor.
+@@ -150,8 +152,6 @@ def event(tagmatch='*', count=1, quiet=False, sock_dir=None):
+             echo $data | jq -colour-output .
+         done
+-        wait
+-
+     Enable debug logging to see ignored events.
+     '''
+     sevent = salt.utils.event.SaltEvent('master',
+[2026-01-24 16:41:26] 
+ACTUAL MESSAGE: Added missing versionadded to state.event runner
+[2026-01-24 16:41:26] GENERATED MESSAGE: Check for `json` option in a state
+[2026-01-24 16:41:26] ==================================================
+
+[2026-01-24 16:41:30] Checkpoint saved at step 9000
+[2026-01-24 16:44:34] 
+==================================================
+[2026-01-24 16:44:34] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:44:34] DIFF:
+FILE: activerecord/test/cases/migration_test.rb
+@@ -1507,7 +1507,7 @@ if ActiveRecord::Base.connection.supports_migrations?
+       rows = conn.select_all("SELECT * FROM #{conn.quote_table_name(sm_table)}")
+       rows.each do |row|
+-        assert_match(/^2\d\d\d-/, row["migrated_at"].to_s, "missing migrated_at")
++        assert_not_nil(row["migrated_at"], "missing migrated_at")
+       end
+       assert_equal "people_have_last_names",  rows[0]["name"]
+       assert_equal "we_need_reminders",       rows[1]["name"]
+[2026-01-24 16:44:34] 
+ACTUAL MESSAGE: make sure we have a value in migrated_at
+[2026-01-24 16:44:34] GENERATED MESSAGE: Ignore uniq on @migration_test case (#)
+The problem was introduced in Rails 5 and is fixed by adding "unused migrated from#name." after the query term for
+[2026-01-24 16:44:34] ==================================================
+
+[2026-01-24 16:44:38] Checkpoint saved at step 9500
+[2026-01-24 16:47:41] 
+==================================================
+[2026-01-24 16:47:41] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:47:41] DIFF:
+FILE: lib/jitsu/package.js
+@@ -440,7 +440,7 @@ package.updateTarball = function (version, pkg, existing, firstSnapshot, callbac
+               error.result = { error: res.trailers['x-build-failure'].toString() };
+               return callback(error);
+             }
+-            jitsu.log.silly('Done creating snapshot ' + version.magenta);
++            jitsu.log.info('Done creating snapshot ' + version.magenta);
+             callback(null, version, pkg);
+           });
+         });
+[2026-01-24 16:47:41] 
+ACTUAL MESSAGE: [fix] Add feedback when streaming build logs are done, fixes #
+[2026-01-24 16:47:41] GENERATED MESSAGE: added debug to output of trailing errors (#)
+* Added debugging for trailers that are not found in the directory tree, so the console will now show the following error code if it's
+[2026-01-24 16:47:41] ==================================================
+
+[2026-01-24 16:47:45] Checkpoint saved at step 10000
+[2026-01-24 16:50:51] 
+==================================================
+[2026-01-24 16:50:51] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:50:51] DIFF:
+FILE: bundles/org.eclipse.packagedrone.utils.rpm/src/org/eclipse/packagedrone/utils/rpm/coding/PayloadCoding.java
+@@ -20,7 +20,7 @@ public enum PayloadCoding
+     LZMA ( "lzma", LZMAPayloadCoding::new ),
+     BZIP2 ( "bzip2", BZip2PayloadCoding::new ),
+     ZSTD ( "zstd", ZstdPayloadCoding::new ),
+-    XZ ( "xz2", XZPayloadCoding::new );
++    XZ ( "xz", XZPayloadCoding::new );
+     private String value;
+[2026-01-24 16:50:51] 
+ACTUAL MESSAGE: Fix typo, thanks @dwalluck for spotting this
+[2026-01-24 16:50:51] GENERATED MESSAGE: Fix for package 'version' in a deprecation warning (#)
+[2026-01-24 16:50:51] ==================================================
+
+[2026-01-24 16:50:55] Checkpoint saved at step 10500
+[2026-01-24 16:54:02] 
+==================================================
+[2026-01-24 16:54:02] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:54:02] DIFF:
+FILE: pyxmpp/client.py
+@@ -390,10 +390,10 @@ class Client:
+     def session_started(self):
+         """Handle session started event. May be overriden in derived classes.
+-        This one sends the initial presence and requests the user's roster."""
++        This one requests the user's roster and sends the initial presence."""
++        self.request_roster()
+         p=Presence()
+         self.stream.send(p)
+-        self.request_roster()
+     def stream_error(self,err):
+         """Handle stream error received. May be overriden in derived classes.
+[2026-01-24 16:54:02] 
+ACTUAL MESSAGE: - request roster before sending the initial presence
+[2026-01-24 16:54:02] GENERATED MESSAGE: Don't leak _proteus_stream if caller is already notified
+[2026-01-24 16:54:02] ==================================================
+
+[2026-01-24 16:54:06] Checkpoint saved at step 11000
+[2026-01-24 16:57:08] 
+==================================================
+[2026-01-24 16:57:08] TEST ON RANDOM VAL DIFF:
+[2026-01-24 16:57:08] DIFF:
+FILE: src/main/java/org/primefaces/component/socket/SocketRenderer.java
+@@ -33,6 +33,11 @@ public class SocketRenderer extends CoreRenderer {
+         String channel = socket.getChannel();
+         String channelUrl = Constants.PUSH_PATH + channel;
+         String url = getResourceURL(context, channelUrl);
++        String pushServer = context.getExternalContext().getInitParameter(Constants.PUSH_SERVER_URL);
++        
++        if(pushServer != null) {
++            url = pushServer + url;
++        }
+ 		writer.startElement("script", null);
+ 		writer.writeAttribute("type", "text/javascript", null);
+[2026-01-24 16:57:08] 
+ACTUAL MESSAGE: Add support for push server url in case it is defined by users, in showcase we use it for example to bypass a reverse proxy
+[2026-01-24 16:57:08] GENERATED MESSAGE: fix for PUT on RENDERERRENDER (#)
+fixes #
+[2026-01-24 16:57:08] ==================================================
+
+[2026-01-24 16:57:12] Checkpoint saved at step 11500
+[2026-01-24 17:00:15] 
+==================================================
+[2026-01-24 17:00:15] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:00:15] DIFF:
+FILE: src/nls/__init__.py
+@@ -168,7 +168,7 @@ class Solution(object):
+         def rect_plot(subplot_number, value, label, name, labelx, labely, xmax=20):
+             subplot(2, 3, subplot_number)
+-            plot(x, p, label=label)
++            plot(x, value, label=label)
+             xlim((0, xmax))
+             legend(loc='best')
+             title(name)
+@@ -182,7 +182,7 @@ class Solution(object):
+         def polar_plot(subplot_number, value, xmax=20):
+             subplot(2, 3, subplot_number, polar=True)
+             theta = arange(0, 2 * 3.14 + 0.1, 0.1)
+-            contourf(theta, x, array([p for _ in theta]).T)
++            contourf(theta, x, array([value for _ in theta]).T)
+             ylim((0, xmax))
+         polar_plot(4, p)
+[2026-01-24 17:00:15] 
+ACTUAL MESSAGE: Fix wrong hardcoded value of plot function.
+[2026-01-24 17:00:15] GENERATED MESSAGE: Add 'right' and None to solution plotting
+[2026-01-24 17:00:15] ==================================================
+
+[2026-01-24 17:00:20] Checkpoint saved at step 12000
+[2026-01-24 17:03:24] 
+==================================================
+[2026-01-24 17:03:24] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:03:24] DIFF:
+FILE: tinkerhub.js
+@@ -6,16 +6,9 @@ network.join();
+ var registry = require('./device/registry')(network);
+-registry.register('log:' + network.id, {
+-	metadata: {
+-		type: 'log'
+-	},
++module.exports = {
++	devices: registry,
+-	info: function() {
+-		console.log.apply(console.log, arguments);
+-	}
+-});
++	storage: storage,
+-module.exports = {
+-	devices: registry
+ };
+[2026-01-24 17:03:24] 
+ACTUAL MESSAGE: Removed test device and exposed storage API
+[2026-01-24 17:03:24] GENERATED MESSAGE: Update log function to expose devices as part of the config file
+[2026-01-24 17:03:24] ==================================================
+
+[2026-01-24 17:03:26] Checkpoint saved at step 12500
+[2026-01-24 17:06:32] 
+==================================================
+[2026-01-24 17:06:32] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:06:32] DIFF:
+FILE: src/ApiController.php
+@@ -528,6 +528,10 @@ class ApiController extends \Illuminate\Routing\Controller
+             /** @var Collection $results */
+             $results = $this->query->select($fields)->get();
++            if ($results->count() == 0) {
++                throw new ResourceNotFoundException();
++            }
++
+         }
+         else {
+             $results = $this->query->select($fields)->skip(0)->take(1)->get();
+[2026-01-24 17:06:32] 
+ACTUAL MESSAGE: Fix: fix #6 in show request
+[2026-01-24 17:06:32] GENERATED MESSAGE: [apis] Fix error in api controller
+[2026-01-24 17:06:32] ==================================================
+
+[2026-01-24 17:06:37] Checkpoint saved at step 13000
+[2026-01-24 17:09:39] 
+==================================================
+[2026-01-24 17:09:39] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:09:39] DIFF:
+FILE: docker/client.py
+@@ -88,7 +88,6 @@ class Client(requests.Session):
+         try:
+             t = tarfile.open(mode='w', fileobj=memfile)
+             t.add(path, arcname='.')
+-            t.list()
+             return memfile.getvalue()
+         finally:
+             memfile.close()
+[2026-01-24 17:09:39] 
+ACTUAL MESSAGE: Removed tar contents printing in Client._tar
+[2026-01-24 17:09:39] GENERATED MESSAGE: Fixed a minor bug
+Fixes #
+[2026-01-24 17:09:39] ==================================================
+
+[2026-01-24 17:09:43] Checkpoint saved at step 13500
+[2026-01-24 17:12:47] 
+==================================================
+[2026-01-24 17:12:47] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:12:47] DIFF:
+FILE: pandas/tests/test_graphics.py
+@@ -395,6 +395,11 @@ class TestDataFramePlots(unittest.TestCase):
+         ax = df.plot(kind='bar', grid=True)
+         self.assertEqual(ax.xaxis.get_ticklocs()[0],
+                          ax.patches[0].get_x() + ax.patches[0].get_width())
++    @slow
++    def test_bar_log(self):
++        df = DataFrame({'A': [3] * 5, 'B': range(5)}, index=range(5))
++        ax = df.plot(kind='bar', grid=True,log=True)
++        self.assertEqual(ax.yaxis.get_ticklocs()[0],0.1)
+     @slow
+     def test_boxplot(self):
+[2026-01-24 17:12:47] 
+ACTUAL MESSAGE: TST: Log scale on bar chart hides bars GH
+[2026-01-24 17:12:47] GENERATED MESSAGE: Bug fix for "bumping" test data frame plots in a pinch of saltful salt
+[2026-01-24 17:12:47] ==================================================
+
+[2026-01-24 17:12:51] Checkpoint saved at step 14000
+[2026-01-24 17:15:57] 
+==================================================
+[2026-01-24 17:15:57] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:15:57] DIFF:
+FILE: app/helpers/govuk_elements_errors_helper.rb
+@@ -35,10 +35,13 @@ module GovukElementsErrorsHelper
+       compact
+   end
+-  def self.child_to_parent object, parents={}
++  def self.child_to_parent object, parents={}, parent_object=nil
++    return parents if object == parent_object
++    parent_object ||= object
++
+     attribute_objects(object).each do |child|
+       parents[child] = object
+-      child_to_parent child, parents
++      child_to_parent child, parents, parent_object
+     end
+     parents
+   end
+[2026-01-24 17:15:57] 
+ACTUAL MESSAGE: Prevent infinite recursion in child_to_parent
+Prevent recursion of object's children in child_to_parent when object is passed in a second time during a recursive loop.
+[2026-01-24 17:15:57] GENERATED MESSAGE: Fix for # child_to not being set in an array when parent is not nil
+[2026-01-24 17:15:57] ==================================================
+
+[2026-01-24 17:16:02] Checkpoint saved at step 14500
+[2026-01-24 17:19:09] 
+==================================================
+[2026-01-24 17:19:09] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:19:09] DIFF:
+FILE: SimpleImage.class.php
+@@ -62,7 +62,7 @@ class SimpleImage {
+ 			'width' => $info[0],
+ 			'height' => $info[1],
+ 			'orientation' => $this->get_orientation(),
+-			'exif' => function_exists('exif_read_data') ? $this->exif = @exif_read_data($this->filename) : null,
++			'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' ? $this->exif = @exif_read_data($this->filename) : null,
+ 			'format' => preg_replace('/^image\//', '', $info['mime']),
+ 			'mime' => $info['mime']
+ 		);
+[2026-01-24 17:19:09] 
+ACTUAL MESSAGE: Fixed EXIF bug where non-JPEG files were processed when they shouldn't have been
+[2026-01-24 17:19:09] GENERATED MESSAGE: Removed extra check to ensure that read_data() return null on x86-pc machines
+[2026-01-24 17:19:09] ==================================================
+
+[2026-01-24 17:19:13] Checkpoint saved at step 15000
+[2026-01-24 17:22:16] 
+==================================================
+[2026-01-24 17:22:16] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:22:16] DIFF:
+FILE: lib/perlin/version.rb
+@@ -1,3 +1,3 @@
+ module Perlin
+-  VERSION = "0.1.1"
++  VERSION = "0.1.2"
+ end
+[2026-01-24 17:22:16] 
+ACTUAL MESSAGE: oops. yanked  by mistake.
+[2026-01-24 17:22:16] GENERATED MESSAGE: Bumped version to
+[2026-01-24 17:22:16] ==================================================
+
+[2026-01-24 17:22:20] Checkpoint saved at step 15500
+[2026-01-24 17:25:26] 
+==================================================
+[2026-01-24 17:25:26] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:25:26] DIFF:
+FILE: src/components/CodeSnippet/CodeSnippet.js
+@@ -51,6 +51,14 @@ export default class CodeSnippet extends Component {
+     }
+   }
++  componentDidUpdate(prevProps) {
++    if (this.props.children !== prevProps.children && this.codeContent) {
++      if (this.codeContent.getBoundingClientRect().height > 255) {
++        this.setState({ shouldShowMoreLessBtn: true });
++      }
++    }
++  }
++
+   expandCode = () => {
+     this.setState({ expandedCode: !this.state.expandedCode });
+   };
+[2026-01-24 17:25:26] 
+ACTUAL MESSAGE: fix(codesnippet): set shouldShowMoreLessBtn if children change (#)
+[2026-01-24 17:25:26] GENERATED MESSAGE: Use `state` to resolve if a state is already present and it's not expanded correctly when calling addCode to remove children
+[2026-01-24 17:25:26] ==================================================
+
+[2026-01-24 17:25:30] Checkpoint saved at step 16000
+[2026-01-24 17:28:35] 
+==================================================
+[2026-01-24 17:28:35] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:28:35] DIFF:
+FILE: provision/cluster/metrics.go
+@@ -24,6 +24,8 @@ type clustersMetricCollector struct{}
+ func (c *clustersMetricCollector) Describe(ch chan<- *prometheus.Desc) {
+ 	ch <- desc
++	ch <- poolsDesc
++	ch <- failureDesc
+ }
+ func (c *clustersMetricCollector) Collect(ch chan<- prometheus.Metric) {
+[2026-01-24 17:28:35] 
+ACTUAL MESSAGE: provision/cluster/metrics: Add missing descriptions on collector
+[2026-01-24 17:28:35] GENERATED MESSAGE: Remove cluster metrics from describing list
+We've added to the description of a clustering metric pool so we can use it as an indicator for other metrics.
+[2026-01-24 17:28:35] ==================================================
+
+[2026-01-24 17:28:40] Checkpoint saved at step 16500
+[2026-01-24 17:31:45] 
+==================================================
+[2026-01-24 17:31:45] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:31:45] DIFF:
+FILE: drools-test-coverage/test-compiler-integration/src/test/java/org/drools/mvel/integrationtests/JBRULESTest.java
+@@ -74,8 +74,7 @@ public class JBRULESTest {
+     @Parameterized.Parameters(name = "KieBase type={0}")
+     public static Collection<Object[]> getParameters() {
+-     // TODO: EM failed with testJBRULES2872, testJBRULES_2995. File JIRAs
+-        return TestParametersUtil.getKieBaseCloudConfigurations(false);
++        return TestParametersUtil.getKieBaseCloudConfigurations(true);
+     }
+     @Test
+[2026-01-24 17:31:45] 
+ACTUAL MESSAGE: [DROOLS-] executable-model test failure in test-compiler-integration JBRULESTest (#)
+[2026-01-24 17:31:45] GENERATED MESSAGE: fix bug when using tests with different kiebase configuration
+[2026-01-24 17:31:45] ==================================================
+
+[2026-01-24 17:31:49] Checkpoint saved at step 17000
+[2026-01-24 17:34:55] 
+==================================================
+[2026-01-24 17:34:55] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:34:55] DIFF:
+FILE: src/Utilities/Request.php
+@@ -3,14 +3,7 @@
+ namespace Yajra\DataTables\Utilities;
+ /**
+- * @method mixed input($key, $default = null)
+- * @method mixed get($key, $default = null)
+- * @method mixed query($key, $default = null)
+- * @method mixed has($key)
+- * @method mixed merge(array $values)
+- * @method bool wantsJson()
+- * @method bool ajax()
+- * @method array all()
++ * @mixin \Illuminate\Http\Request
+  */
+ class Request
+ {
+[2026-01-24 17:34:55] 
+ACTUAL MESSAGE: Use mixin for better IDE support.
+[2026-01-24 17:34:55] GENERATED MESSAGE: Added call to mix in the `get` method
+[2026-01-24 17:34:55] ==================================================
+
+[2026-01-24 17:34:59] Checkpoint saved at step 17500
+[2026-01-24 17:38:03] 
+==================================================
+[2026-01-24 17:38:03] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:38:03] DIFF:
+FILE: yt_array.py
+@@ -403,24 +403,28 @@ class YTArray(np.ndarray):
+     @property
+     def value(self):
++        """Get a copy of the array data as a numpy ndarray"""
+         return np.array(self)
+     v = value
+     @property
+-    def data(self):
++    def ndview(self):
++        """Get a view of the array data."""
+         return self.ndarray_view()
+-    d = data
++    d = ndview
+     @property
+     def unit_quantity(self):
++        """Get a YTQuantity with the same unit as this array and a value of 1.0"""
+         return YTQuantity(1.0, self.units)
+     uq = unit_quantity
+     @property
+     def unit_array(self):
++        """Get a YTArray filled with ones with the same unit and shape as this array"""
+         return np.ones_like(self)
+     ua = unit_array
+[2026-01-24 17:38:03] 
+ACTUAL MESSAGE: Responding to PR comments.  Adding docstrings.
+--HG--
+branch : yt-
+[2026-01-24 17:38:03] GENERATED MESSAGE: added support for multiple arrays
+[2026-01-24 17:38:03] ==================================================
+
+[2026-01-24 17:38:07] Checkpoint saved at step 18000
+[2026-01-24 17:41:11] 
+==================================================
+[2026-01-24 17:41:11] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:41:11] DIFF:
+FILE: lib/spring/sid.rb
+@@ -25,7 +25,7 @@ module Spring
+         if Process.respond_to?(:getsid)
+           # Ruby 2
+           Process.getsid
+-        elsif defined?(Fiddle)
++        elsif defined?(Fiddle) and defined?(DL)
+           # Ruby 1.9.3 compiled with libffi support
+           fiddle_func.call(0)
+         else
+[2026-01-24 17:41:11] 
+ACTUAL MESSAGE: Fix usage of uninitialized ::DL in Ruby 
+When compiling Ruby  with clang, Fiddle is compiled in while DL is not.
+This commit fixes an usage of the DL module in the case it's not compiled in.
+Unfortunately Fiddle::Handle and Fiddle.dlopen were only added in Ruby 2, but
+a dlopen call (available as part of the DL module) is needed to use
+Fiddle::Function.
+Fixes #
+[2026-01-24 17:41:11] GENERATED MESSAGE: Fix a bug in the ::sid#set_getter method that was causing all getters to fail in ruby
+[2026-01-24 17:41:11] ==================================================
+
+[2026-01-24 17:41:15] Checkpoint saved at step 18500
+[2026-01-24 17:44:19] 
+==================================================
+[2026-01-24 17:44:19] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:44:19] DIFF:
+FILE: ctypeslib/__init__.py
+@@ -22,7 +22,7 @@ else:
+ try:
+     from ctypes.util import find_library
+     # debug for python-haystack travis-ci
+-    for version in ["clang", "clang-6.0", "clang-5.0", "clang-4.0", "clang-3.9", "clang-3.8", "clang-3.7"]:
++    for version in ["libclang", "clang", "clang-6.0", "clang-5.0", "clang-4.0", "clang-3.9", "clang-3.8", "clang-3.7"]:
+         if find_library(version) is not None:
+             from clang import cindex
+             cindex.Config.set_library_file(find_library(version))
+FILE: setup.py
+@@ -5,7 +5,7 @@ from setuptools import setup
+ setup(
+     name="ctypeslib2",
+-    version="2.2.0",
++    version="2.2.1",
+     description="ctypeslib2 - FFI toolkit, relies on clang",
+     long_description=open("README.md").read(),
+     author="Loic Jaquemet",
+[2026-01-24 17:44:19] 
+ACTUAL MESSAGE: fix ctypeslib/clang on windows. clang needs to be in PATH.
+[2026-01-24 17:44:19] GENERATED MESSAGE: Update Python docstring of the ctypeslib package
+[2026-01-24 17:44:19] ==================================================
+
+[2026-01-24 17:44:23] Checkpoint saved at step 19000
+[2026-01-24 17:47:26] 
+==================================================
+[2026-01-24 17:47:26] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:47:26] DIFF:
+FILE: webpack/scenes/ContentViews/Details/ContentViewDetailActions.js
+@@ -168,7 +168,7 @@ export const getRepositories = params => get({
+ });
+ export const getContentViewRepositories = (cvId, params, status) => {
+-  const apiParams = { ...params };
++  const apiParams = { organization_id: orgId(), ...params };
+   let apiUrl = `/content_views/${cvId}/repositories`;
+   if (status === ALL_STATUSES) {
+[2026-01-24 17:47:26] 
+ACTUAL MESSAGE: Fixes # - Repo filtering shows all repos in different organizations (#)
+[2026-01-24 17:47:26] GENERATED MESSAGE: Remove deprecated apiParams from the description (#)
+[2026-01-24 17:47:26] ==================================================
+
+[2026-01-24 17:47:30] Checkpoint saved at step 19500
+[2026-01-24 17:50:36] 
+==================================================
+[2026-01-24 17:50:36] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:50:36] DIFF:
+FILE: lib/commands/bridge.js
+@@ -172,7 +172,9 @@ module.exports = function(args,api,config,cb){
+       console.log("Worker being forked with uid "+uid+" and gid "+gid);
+     }
+-    connected = proc = cp.spawn(node,[file,bridge,'--worker','--port',port,'--uid',uid,'--gid',gid]);
++    var args = [file,bridge,'--worker','--port',port,'--uid',uid,'--gid',gid];
++    if(verbose) args.push('-v');
++    connected = proc = cp.spawn(node,args);
+     var c = 0;
+     var exits = 3;
+[2026-01-24 17:50:36] 
+ACTUAL MESSAGE: fixing verbose flag passing to child procs
+[2026-01-24 17:50:36] GENERATED MESSAGE: Add command to spawn goroutine on worker state.
+[2026-01-24 17:50:36] ==================================================
+
+[2026-01-24 17:50:40] Checkpoint saved at step 20000
+[2026-01-24 17:53:44] 
+==================================================
+[2026-01-24 17:53:44] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:53:44] DIFF:
+FILE: Xlib/support/unix_connect.py
+@@ -86,8 +86,12 @@ def get_socket(dname, host, dno):
+         # Else use Unix socket
+         else:
++            address = '/tmp/.X11-unix/X%d' % dno
++            if not os.path.exists(address):
++                # Use abstract address.
++                address = '\0' + address
+             s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+-            s.connect('/tmp/.X11-unix/X%d' % dno)
++            s.connect(address)
+     except socket.error as val:
+         raise error.DisplayConnectionError(dname, str(val))
+[2026-01-24 17:53:44] 
+ACTUAL MESSAGE: support/unix_connect: improve Unix socket support
+Use an abstract address if no matching filesystem path is found.
+[2026-01-24 17:53:44] GENERATED MESSAGE: Add Unix address to xnet socket support
+It was previously added by another commit that added an anonymous X server with no internal socket so there's the risk of having a remote localhost but not its
+[2026-01-24 17:53:44] ==================================================
+
+[2026-01-24 17:53:48] Checkpoint saved at step 20500
+[2026-01-24 17:56:51] 
+==================================================
+[2026-01-24 17:56:51] TEST ON RANDOM VAL DIFF:
+[2026-01-24 17:56:51] DIFF:
+FILE: src/java/org/apache/cassandra/service/StorageProxy.java
+@@ -924,7 +924,7 @@ public class StorageProxy implements StorageProxyMBean
+                                     columnsCount += row.getLiveColumnCount();
+                                     logger.debug("range slices read {}", row.key);
+                                 }
+-                                FBUtilities.waitOnFutures(resolver.repairResults, DatabaseDescriptor.getReadRpcTimeout());
++                                FBUtilities.waitOnFutures(resolver.repairResults, DatabaseDescriptor.getRangeRpcTimeout());
+                             }
+                             catch (TimeoutException ex)
+                             {
+[2026-01-24 17:56:51] 
+ACTUAL MESSAGE: Fix typo in CASSANDRA-
+[2026-01-24 17:56:51] GENERATED MESSAGE: refactoring timeout for range slice operations to a few milliseconds (#)
+[2026-01-24 17:56:51] ==================================================
+
+[2026-01-24 17:56:56] Checkpoint saved at step 21000
+[2026-01-24 18:00:00] 
+==================================================
+[2026-01-24 18:00:00] TEST ON RANDOM VAL DIFF:
+[2026-01-24 18:00:00] DIFF:
+FILE: salt/modules/virt.py
+@@ -11,11 +11,11 @@ import os
+ import re
+ import shutil
+ import subprocess
+-from xml.dom import minidom
+ # Import third party libs
+ try:
+     import libvirt
++    from xml.dom import minidom
+     HAS_LIBVIRT = True
+ except ImportError:
+     HAS_LIBVIRT = False
+[2026-01-24 18:00:00] 
+ACTUAL MESSAGE: move dom import to try/except.
+Windows barfs on from xml.dom import minidom
+[2026-01-24 18:00:00] GENERATED MESSAGE: Fixing dependency on Salt.modules.virt.MINIDOM since it's no longer needed in PyPI
+[2026-01-24 18:00:00] ==================================================
+
+[2026-01-24 18:00:04] Checkpoint saved at step 21500
+[2026-01-24 18:03:13] 
+==================================================
+[2026-01-24 18:03:13] TEST ON RANDOM VAL DIFF:
+[2026-01-24 18:03:13] DIFF:
+FILE: tests/Loco/Utils/Swizzle/Tests/SwaggerClientTest.php
+@@ -122,7 +122,7 @@ class SwaggerClientTest extends GuzzleTestCase {
+         // Should have one model
+         $models = $declaration->getModels();
+         $this->assertCount( 1, $models );
+-        $this->assertArrayHasKey( 'Echo', $models );
++        $this->assertArrayHasKey( 'Echo', $models->toArray() );
+     }
+[2026-01-24 18:03:13] 
+ACTUAL MESSAGE: updated test for collection in place of array
+[2026-01-24 18:03:13] GENERATED MESSAGE: [Fix] Fix a bug that caused the new client test to fail due not having an array with keys like this
+[2026-01-24 18:03:13] ==================================================
+
+[2026-01-24 18:03:17] Checkpoint saved at step 22000
+[2026-01-24 18:06:22] 
+==================================================
+[2026-01-24 18:06:22] TEST ON RANDOM VAL DIFF:
+[2026-01-24 18:06:22] DIFF:
+FILE: router/router.go
+@@ -18,6 +18,8 @@ along with this program.  If not, see <
+ package router
+ import (
++	"strconv"
++
+ 	"github.com/labstack/echo/v4"
+ 	"github.com/labstack/echo/v4/middleware"
+ 	"github.com/nerdzeu/nerdz-api/nerdz"
+@@ -27,7 +29,6 @@ import (
+ 	"github.com/nerdzeu/nerdz-api/rest/user"
+ 	"github.com/nerdzeu/nerdz-api/stream"
+ 	"github.com/openshift/osin"
+-	"strconv"
+ )
+ // VERSION is the API version and base path of requests: /v<VERSION>/
+@@ -72,6 +73,7 @@ func Init(enableLog bool) *echo.Echo {
+ 	o.GET("/authorize", oauth2.Authorize())
+ 	o.POST("/authorize", oauth2.Authorize())
+ 	o.GET("/token", oauth2.Token())
++	o.POST("/token", oauth2.Token())
+ 	o.GET("/info", oauth2.Info())
+ 	/**************************************************************************
+[2026-01-24 18:06:22] 
+ACTUAL MESSAGE: /token also with POST method
+[2026-01-24 18:06:22] GENERATED MESSAGE: Replace HTTP status code with HTTP error code.
+Former-commit--abccc9eb3ddfad5bcfaacaf1decfa0aeaaedee
+Ref
+[2026-01-24 18:06:22] ==================================================
+
+[2026-01-24 18:06:26] Checkpoint saved at step 22500
+[2026-01-24 18:09:31] 
+==================================================
+[2026-01-24 18:09:31] TEST ON RANDOM VAL DIFF:
+[2026-01-24 18:09:31] DIFF:
+FILE: glitter/pages/middleware.py
+@@ -41,6 +41,7 @@ class GlitterUrlConf(object):
+         importlib.reload(root_urlconf)
+         importlib.reload(glitter_urls)
+         self.urlpatterns = root_urlconf.urlpatterns
++        self.handler500 = root_urlconf.handler500
+ class GlitterUrlConfMiddleware(object):
+[2026-01-24 18:09:31] 
+ACTUAL MESSAGE: monkey patch in handler
+[2026-01-24 18:09:31] GENERATED MESSAGE: Remove handler for glitter urlconf middlewares. (#)
+[2026-01-24 18:09:31] ==================================================
+
+[2026-01-24 18:09:35] Checkpoint saved at step 23000
+[2026-01-24 18:18:57] Summary Epoch 1: Train Loss: 1.6671| Train Accuracy: 0.4833        | Val Loss: 1.5057| Val Accuracy: 0.5179)| PPL: 4.5072
+[2026-01-25 18:51:28] Length Train:116521
+[2026-01-25 18:51:28] Length Val:24969
+[2026-01-25 18:51:29] New Length Train: 92181
+[2026-01-25 18:51:29] New Length Val: 19706
+[2026-01-25 18:51:31] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 18:51:34] Resuming from Epoch 0, Global Step 23000
+[2026-01-25 19:03:17] Summary Epoch 1: Train Loss: 0.0031| Train Accuracy: 0.0010        | Val Loss: 1.5059| Val Accuracy: 0.5179)| PPL: 4.5082
+[2026-01-25 19:13:49] Length Train:116521
+[2026-01-25 19:13:49] Length Val:24969
+[2026-01-25 19:13:49] New Length Train: 92181
+[2026-01-25 19:13:49] New Length Val: 19706
+[2026-01-25 19:13:50] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 19:13:52] Resuming from Epoch 0, Global Step 23000
+[2026-01-25 19:18:47] Length Train:116521
+[2026-01-25 19:18:47] Length Val:24969
+[2026-01-25 19:18:47] New Length Train: 92181
+[2026-01-25 19:18:47] New Length Val: 19706
+[2026-01-25 19:18:48] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 19:18:49] Resuming from Epoch 0, Global Step 23000
+[2026-01-25 19:19:08] Length Train:116521
+[2026-01-25 19:19:08] Length Val:24969
+[2026-01-25 19:19:08] New Length Train: 92181
+[2026-01-25 19:19:08] New Length Val: 19706
+[2026-01-25 19:19:09] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 19:19:10] Resuming from Epoch 0, Global Step 23000
+[2026-01-25 19:31:01] Summary Epoch 1: Train Loss: 0.0031| Train Accuracy: 0.0010        | Val Loss: 1.5059| Val Accuracy: 0.5179)| PPL: 4.5082
+[2026-01-25 19:31:03] >>> New best model saved!
+[2026-01-25 19:33:55] 
+==================================================
+[2026-01-25 19:33:55] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:33:55] DIFF:
+FILE: src/transformers/data/data_collator.py
+@@ -87,7 +87,8 @@ class DataCollatorForLanguageModeling:
+             return {"input_ids": inputs, "labels": labels}
+         else:
+             labels = batch.clone().detach()
+-            labels[labels == self.tokenizer.pad_token_id] = -100
++            if self.tokenizer.pad_token_id is not None:
++                labels[labels == self.tokenizer.pad_token_id] = -100
+             return {"input_ids": batch, "labels": labels}
+     def _tensorize_batch(self, examples: List[torch.Tensor]) -> torch.Tensor:
+[2026-01-25 19:33:55] 
+ACTUAL MESSAGE: fix labels (#)
+[2026-01-25 19:33:55] GENERATED MESSAGE: Fixes to be more accurate in the data collators when creating dicts (#)
+[2026-01-25 19:33:55] ==================================================
+
+[2026-01-25 19:33:59] Checkpoint saved at step 23500
+[2026-01-25 19:37:09] 
+==================================================
+[2026-01-25 19:37:09] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:37:09] DIFF:
+FILE: setup.py
+@@ -368,6 +368,7 @@ def setup_package():
+             'Programming Language :: Python :: 3.4',
+             'Programming Language :: Python :: 3.5',
+             'Programming Language :: Python :: 3.6',
++            'Programming Language :: Python :: 3.7',
+         ],
+         'keywords': 'earthquake correlation detection match-filter',
+         'scripts': scriptfiles,
+[2026-01-25 19:37:09] 
+ACTUAL MESSAGE: Add  to setup.py
+[2026-01-25 19:37:09] GENERATED MESSAGE: add python to the setup package requirement (#)
+[2026-01-25 19:37:09] ==================================================
+
+[2026-01-25 19:37:13] Checkpoint saved at step 24000
+[2026-01-25 19:40:20] 
+==================================================
+[2026-01-25 19:40:20] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:40:20] DIFF:
+FILE: crudbuilder/mixins.py
+@@ -79,6 +79,8 @@ class CrudBuilderMixin(LoginRequiredMixin, PermissionRequiredMixin):
+         context['app_label'] = model._meta.app_label
+         context['actual_model_name'] = model.__name__.lower()
+         context['pluralized_model_name'] = plural(model.__name__.lower())
++        context['verbose_model_name'] = model._meta.verbose_name
++        context['verbose_model_name_plural'] = model._meta.verbose_name_plural
+         context['project_name'] = getattr(
+             settings, 'PROJECT_NAME', 'CRUDBUILDER')
+         return context
+[2026-01-25 19:40:20] 
+ACTUAL MESSAGE: Adds (pluralised) verbose model name to the template contexts.
+This is more user friendly than the class name.
+[2026-01-25 19:40:20] GENERATED MESSAGE: Fix verbosity of mixed models (#)
+[2026-01-25 19:40:20] ==================================================
+
+[2026-01-25 19:40:24] Checkpoint saved at step 24500
+[2026-01-25 19:43:32] 
+==================================================
+[2026-01-25 19:43:32] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:43:32] DIFF:
+FILE: render.py
+@@ -7,6 +7,11 @@ from generator import Generator
+ from optparse import OptionParser
+ parser = OptionParser()
++parser.add_option("-b", "--debug",
++                  action="store_true",
++                  dest="debug",
++                  help="Will display any exception trace to stdin",
++                  default=False)
+ parser.add_option("-d", "--destination",
+                   dest="destination_file",
+                   help="The path to the to the destination file: .html or "
+@@ -48,7 +53,10 @@ parser.add_option("-v", "--verbose",
+ (options, args) = parser.parse_args()
+-try:
++if (options.debug):
+     Generator(options, args).execute()
+-except Exception, e:
+-    sys.exit("Error: %s" % e)
++else:
++    try:
++        Generator(options, args).execute()
++    except Exception, e:
++        sys.exit("Error: %s" % e)
+[2026-01-25 19:43:32] 
+ACTUAL MESSAGE: added a --debug option to the command line
+[2026-01-25 19:43:32] GENERATED MESSAGE: add support for debug mode of outputting the logger
+[2026-01-25 19:43:32] ==================================================
+
+[2026-01-25 19:43:36] Checkpoint saved at step 25000
+[2026-01-25 19:46:45] 
+==================================================
+[2026-01-25 19:46:45] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:46:45] DIFF:
+FILE: packages/cli/test/models/network/NetworkController.test.js
+@@ -1,13 +1,15 @@
+ 'use strict';
+ require('../../setup');
++import { assert, expect } from 'chai';
++
+ import sinon from 'sinon';
+ import NetworkController from '../../../src/models/network/NetworkController';
+ import NetworkFile from '../../../src/models/files/NetworkFile';
+ import ProjectFile from '../../../src/models/files/ProjectFile';
+ import { AppProjectDeployer } from '../../../src/models/network/ProjectDeployer';
+-contract('NetworkController', function() {
++describe('NetworkController', function() {
+   let projectFile, networkFile, controller;
+   beforeEach(() => {
+[2026-01-25 19:46:45] 
+ACTUAL MESSAGE: Migrate new test to test-enviroment
+[2026-01-25 19:46:45] GENERATED MESSAGE: change the `network` api to use `api` in tests, closes #
+[2026-01-25 19:46:45] ==================================================
+
+[2026-01-25 19:46:49] Checkpoint saved at step 25500
+[2026-01-25 19:49:57] 
+==================================================
+[2026-01-25 19:49:57] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:49:57] DIFF:
+FILE: src/render.js
+@@ -134,7 +134,7 @@ function _render(callback) {
+                 }
+             }
+             if (convertPrevShape) {
+-                var prevPathData = data.alternativeOld || data;
++                var prevPathData = data.alternativeOld;
+                 var pathElement = replaceElement(element, prevPathData);
+                 pathElement.data([data], function () {
+                     return data.key;
+[2026-01-25 19:49:57] 
+ACTUAL MESSAGE: Removed unused stuff
+This particular stuff is unused since alternative old data always
+exist if we are going to convert the previous shape.
+[2026-01-25 19:49:57] GENERATED MESSAGE: fix doc string comparison in render render callback (#)
+[2026-01-25 19:49:57] ==================================================
+
+[2026-01-25 19:50:02] Checkpoint saved at step 26000
+[2026-01-25 19:53:10] 
+==================================================
+[2026-01-25 19:53:10] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:53:10] DIFF:
+FILE: setup.py
+@@ -15,7 +15,7 @@ with codecs.open(os.path.join(os.path.abspath(os.path.dirname(
+ def read(f):
+     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
+-install_requires = ['aiohttp>=0.14', 'mako>=1.0.0']
++install_requires = ['aiohttp>=0.17', 'mako>=1.0.0']
+ tests_require = install_requires + ['nose']
+@@ -29,8 +29,8 @@ setup(name='aiohttp_mako',
+           'Intended Audience :: Developers',
+           'Programming Language :: Python',
+           'Programming Language :: Python :: 3',
+-          'Programming Language :: Python :: 3.3',
+           'Programming Language :: Python :: 3.4',
++          'Programming Language :: Python :: 3.5',
+           'Topic :: Internet :: WWW/HTTP'],
+       author='Nikolay Novik',
+       author_email='nickolainovik@gmail.com',
+[2026-01-25 19:53:10] 
+ACTUAL MESSAGE: drop python  support
+[2026-01-25 19:53:10] GENERATED MESSAGE: Bumping Python version to .
+[2026-01-25 19:53:10] ==================================================
+
+[2026-01-25 19:53:14] Checkpoint saved at step 26500
+[2026-01-25 19:56:21] 
+==================================================
+[2026-01-25 19:56:21] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:56:21] DIFF:
+FILE: ftests/core/src/main/java/org/commonjava/indy/ftest/core/infinispan/CacheProducerMergeXmlTest.java
+@@ -64,7 +64,6 @@ public class CacheProducerMergeXmlTest
+     public void testMerge()
+             throws Exception
+     {
+-        assertThat( manager.getCacheNames().size(), equalTo( 9 ) );
+         assertThat( manager.getCacheConfiguration( "local" ).eviction().size(), equalTo( 10000000L ) );
+         assertThat( manager.getCacheConfiguration( "koji-maven-version-metadata" ).eviction().size(),
+                     equalTo( 10000000L ) );
+[2026-01-25 19:56:21] 
+ACTUAL MESSAGE: Update CacheProducerMergeXmlTest due to infinispan.xml being changed
+[2026-01-25 19:56:21] GENERATED MESSAGE: Remove erroneous assertion in favor of testing with maven version
+[2026-01-25 19:56:21] ==================================================
+
+[2026-01-25 19:56:25] Checkpoint saved at step 27000
+[2026-01-25 19:59:32] 
+==================================================
+[2026-01-25 19:59:32] TEST ON RANDOM VAL DIFF:
+[2026-01-25 19:59:32] DIFF:
+FILE: master/buildbot/test/unit/test_db_schedulers.py
+@@ -259,13 +259,17 @@ class Tests(interfaces.InterfaceTests):
+             self.scheduler24, self.master13, self.scheduler24master,
+             self.scheduler25,
+         ])
++
++        def schKey(sch):
++            return sch['id']
++
+         schlist = yield self.db.schedulers.getSchedulers()
+         [validation.verifyDbDict(self, 'schedulerdict', sch)
+          for sch in schlist]
+-        self.assertEqual(sorted(schlist), sorted([
++        self.assertEqual(sorted(schlist, key=schKey), sorted([
+             dict(id=24, name='schname', masterid=13),
+             dict(id=25, name='schname2', masterid=None),
+-        ]))
++        ], key=schKey))
+     @defer.inlineCallbacks
+     def test_getSchedulers_masterid(self):
+[2026-01-25 19:59:32] 
+ACTUAL MESSAGE: Add a key to add to sorted() to eliminate this error on Python 3:
+Builtins.TypeError: '<' not supported between instances of 'dict' and 'dict'
+[2026-01-25 19:59:32] GENERATED MESSAGE: Adding new Test for scheduled jobs
+[2026-01-25 19:59:32] ==================================================
+
+[2026-01-25 19:59:34] Checkpoint saved at step 27500
+[2026-01-25 20:02:43] 
+==================================================
+[2026-01-25 20:02:43] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:02:43] DIFF:
+FILE: src/Trackable.php
+@@ -50,17 +50,17 @@ trait Trackable
+         return null;
+     }
+-    protected function prepareStatus()
+-    {
+-        /** @var JobStatus $entityClass */
+-        $entityClass = app()->getAlias(JobStatus::class);
+-        /** @var JobStatus $status */
+-        $status = $entityClass::create([
+-            'type' => static::class
+-        ]);
+-        
+-        $this->statusId = $status->id;
+-    }
++	protected function prepareStatus(array $data = [])
++	{
++		/** @var JobStatus $entityClass */
++		$entityClass = app()->getAlias(JobStatus::class);
++
++		$data = array_merge(["type" => static::class], $data);
++		/** @var JobStatus $status */
++		$status = $entityClass::create($data);
++
++		$this->statusId = $status->id;
++	}
+     public function getJobStatusId()
+     {
+[2026-01-25 20:02:43] 
+ACTUAL MESSAGE: Added possibility to provide additional data when calling prepareStatus()
+[2026-01-25 20:02:43] GENERATED MESSAGE: Make sure that the method is called before it is used to create the job status.
+[2026-01-25 20:02:43] ==================================================
+
+[2026-01-25 20:02:47] Checkpoint saved at step 28000
+[2026-01-25 20:05:56] 
+==================================================
+[2026-01-25 20:05:56] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:05:56] DIFF:
+FILE: tests/IpTest.php
+@@ -59,7 +59,7 @@ final class IpTest extends TestCase
+     public function testValidateIp()
+     {
+         $this->assertTrue(
+-            Ip::validate('8.11.0.8')
++            $this->Ip->validate('8.11.0.8')
+         );
+     }
+@@ -71,7 +71,7 @@ final class IpTest extends TestCase
+     public function testValidateWrongIp()
+     {
+         $this->assertFalse(
+-            Ip::validate('08.11.0.8')
++            $this->Ip->validate('08.11.0.8')
+         );
+     }
+@@ -84,7 +84,7 @@ final class IpTest extends TestCase
+     {
+         $this->assertContains(
+             '8.11.0.8',
+-            Ip::get()
++            $this->Ip->get()
+         );
+     }
+ }
+[2026-01-25 20:05:56] 
+ACTUAL MESSAGE: Updated to  version
+[2026-01-25 20:05:56] GENERATED MESSAGE: fix bug where wrong code was being generated when testing the pester error
+[2026-01-25 20:05:56] ==================================================
+
+[2026-01-25 20:06:00] Checkpoint saved at step 28500
+[2026-01-25 20:09:08] 
+==================================================
+[2026-01-25 20:09:08] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:09:08] DIFF:
+FILE: lib/opentsdb/version.rb
+@@ -1,3 +1,3 @@
+ module OpenTSDB
+-  VERSION = '1.0.0'
++  VERSION = '1.0.1'
+ end
+[2026-01-25 20:09:08] 
+ACTUAL MESSAGE: Version bump to address checksum issue in rubygems.org
+[2026-01-25 20:09:08] GENERATED MESSAGE: Increment version to
+[2026-01-25 20:09:08] ==================================================
+
+[2026-01-25 20:09:12] Checkpoint saved at step 29000
+[2026-01-25 20:12:23] 
+==================================================
+[2026-01-25 20:12:23] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:12:23] DIFF:
+FILE: padme/__init__.py
+@@ -190,13 +190,13 @@ from __future__ import print_function, absolute_import, unicode_literals
+ import logging
+ import sys
+-_logger = logging.getLogger("padme")
+-
+ __author__ = 'Zygmunt Krynicki'
+ __email__ = 'zygmunt.krynicki@canonical.com'
+ __version__ = '1.0'
+ __all__ = (str('proxy'), )
++_logger = logging.getLogger("padme")
++
+ class proxy_meta(type):
+[2026-01-25 20:12:23] 
+ACTUAL MESSAGE: Reorder _logger after __all__ and friends
+[2026-01-25 20:12:23] GENERATED MESSAGE: fix pygments on Python  (#) #3 Fixes a bug where _logger.trace() is not being set to log.trace()
+[2026-01-25 20:12:23] ==================================================
+
+[2026-01-25 20:12:27] Checkpoint saved at step 29500
+[2026-01-25 20:15:32] 
+==================================================
+[2026-01-25 20:15:32] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:15:32] DIFF:
+FILE: core-bundle/src/Resources/contao/dca/tl_article.php
+@@ -205,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_article'] = array
+ 			'foreignKey'              => 'tl_user.name',
+ 			'eval'                    => array('doNotCopy'=>true, 'mandatory'=>true, 'chosen'=>true, 'includeBlankOption'=>true, 'tl_class'=>'w50'),
+ 			'sql'                     => "int(10) unsigned NOT NULL default '0'",
+-			'relation'                => array('type'=>'hasOne', 'load'=>'eager')
++			'relation'                => array('type'=>'hasOne', 'load'=>'lazy')
+ 		),
+ 		'inColumn' => array
+ 		(
+[2026-01-25 20:15:32] 
+ACTUAL MESSAGE: [Core] Reduce memory consumption during sitemap generation (see #).
+Description
+-----------
+See <URL>
+[2026-01-25 20:15:32] GENERATED MESSAGE: Update docstring for tl_article in “ttl
+[2026-01-25 20:15:32] ==================================================
+
+[2026-01-25 20:15:37] Checkpoint saved at step 30000
+[2026-01-25 20:18:44] 
+==================================================
+[2026-01-25 20:18:44] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:18:44] DIFF:
+FILE: bcbio/structural/cnvkit.py
+@@ -676,7 +676,7 @@ def _add_diagram_plot(out, data):
+             cmd = [_get_cmd(), "diagram", "-s", cns,
+                    "-o", tx_out_file, cnr]
+             gender = population.get_gender(data)
+-            if gender and gender.lower() == "male":
++            if gender:
+                 cmd += ["--sample-sex", gender]
+             do.run(_prep_cmd(cmd, tx_out_file), "CNVkit diagram plot")
+     return out_file
+[2026-01-25 20:18:44] 
+ACTUAL MESSAGE: CNVkit: avoid male check, pass gender #
+[2026-01-25 20:18:44] GENERATED MESSAGE: Fix for diagram plot to display male as equal number of pixels
+[2026-01-25 20:18:44] ==================================================
+
+[2026-01-25 20:18:48] Checkpoint saved at step 30500
+[2026-01-25 20:22:09] 
+==================================================
+[2026-01-25 20:22:09] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:22:09] DIFF:
+FILE: ykman/cli/fido.py
+@@ -29,6 +29,7 @@ from __future__ import absolute_import
+ import click
+ import logging
+ from fido_host.hid import CtapError
++from time import sleep
+ from .util import click_skip_on_help, prompt_for_touch
+ from ..util import TRANSPORT
+ from ..fido import Fido2Controller
+@@ -163,6 +164,7 @@ def reset(ctx):
+     removed = False
+     while True:
++        sleep(0.1)
+         descriptors = list(get_descriptors())
+         n_keys = len(descriptors)
+         if not n_keys:
+[2026-01-25 20:22:09] 
+ACTUAL MESSAGE: Sleep a bit in fido reset loop
+[2026-01-25 20:22:09] GENERATED MESSAGE: Reset clock timeout when removing a descriptor
+[2026-01-25 20:22:09] ==================================================
+
+[2026-01-25 20:22:13] Checkpoint saved at step 31000
+[2026-01-25 20:25:20] 
+==================================================
+[2026-01-25 20:25:20] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:25:20] DIFF:
+FILE: git/repo/base.py
+@@ -873,7 +873,8 @@ class Repo(object):
+     @classmethod
+     def _clone(cls, git, url, path, odb_default_type, progress, **kwargs):
+-        progress = to_progress_instance(progress)
++        if progress is not None:
++            progress = to_progress_instance(progress)
+         # special handling for windows for path at which the clone should be
+         # created.
+[2026-01-25 20:25:20] 
+ACTUAL MESSAGE: fix(repo): prevent error messages from being swallowed
+This issue must have rosen from `to_progress_instance()`
+being inserted in a spot where `None` was a legit value.
+Fixes #
+[2026-01-25 20:25:20] GENERATED MESSAGE: Fix issue with remote cloning that was causing issue with PyGit
+[2026-01-25 20:25:20] ==================================================
+
+[2026-01-25 20:25:24] Checkpoint saved at step 31500
+[2026-01-25 20:28:31] 
+==================================================
+[2026-01-25 20:28:31] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:28:31] DIFF:
+FILE: ocdsmerge/flatten.py
+@@ -53,7 +53,7 @@ def is_versioned_value(value):
+     return len(value) == 4 and VERSIONED_VALUE_KEYS.issuperset(value)
+-def flatten(obj, merge_rules, rule_overrides, path=None, rule_path=None, flattened=None):
++def flatten(obj, merge_rules, rule_overrides, path=(), rule_path=(), flattened=None):
+     """
+     Flattens a JSON object into key-value pairs, in which the key is the JSON path as a tuple. For example:
+@@ -84,12 +84,8 @@ def flatten(obj, merge_rules, rule_overrides, path=None, rule_path=None, flatten
+            ('a', '2', 'id'): 2,
+        }
+     """
+-    if path is None:
+-        path = ()
+     if flattened is None:
+         flattened = {}
+-    if rule_path is None:
+-        rule_path = ()
+     if isinstance(obj, dict):
+         iterable = obj.items()
+[2026-01-25 20:28:31] 
+ACTUAL MESSAGE: Use tuple as default argument
+[2026-01-25 20:28:31] GENERATED MESSAGE: Make flatten use `flatten` for the metainfo rules
+[2026-01-25 20:28:31] ==================================================
+
+[2026-01-25 20:28:36] Checkpoint saved at step 32000
+[2026-01-25 20:31:47] 
+==================================================
+[2026-01-25 20:31:47] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:31:47] DIFF:
+FILE: modules/system/lang/fr/lang.php
+@@ -94,7 +94,7 @@ return [
+         'disabled_label' => 'Désactivé',
+         'disabled_help' => 'Les plugins désactivés sont ignorés par l’application.',
+         'frozen_label' => 'Mises à jour bloquées',
+-        'frozen_help' => 'Les plugins qui sont bloqués seront ignorés par le processus de mise à jour.',
++        'frozen_help' => 'Les plugins bloqués seront ignorés par le processus de mise à jour.',
+         'selected_amount' => 'Plugins sélectionnés : :amount',
+         'remove_confirm' => 'Confirmer la suppression de ce plugin ?',
+         'remove_success' => "Les plugins ont été supprimés avec succès.",
+[2026-01-25 20:31:47] 
+ACTUAL MESSAGE: Update of FRENCH language for OctoberCMS
+[2026-01-25 20:31:47] GENERATED MESSAGE: Bugfix(lang): changed frozen translation
+[2026-01-25 20:31:47] ==================================================
+
+[2026-01-25 20:31:52] Checkpoint saved at step 32500
+[2026-01-25 20:35:01] 
+==================================================
+[2026-01-25 20:35:01] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:35:01] DIFF:
+FILE: bbs/bbs.go
+@@ -24,7 +24,7 @@ type ExecutorBBS interface {
+ type RepBBS interface {
+ 	//services
+-	MaintainRepPresence(heartbeatInterval time.Duration, repPresence models.RepPresence) (Presence, <-chan bool, error)
++	MaintainRepPresence(heartbeatInterval time.Duration, repPresence models.RepPresence) (services_bbs.Presence, <-chan bool, error)
+ 	//task
+ 	WatchForDesiredTask() (<-chan models.Task, chan<- bool, <-chan error)
+[2026-01-25 20:35:01] 
+ACTUAL MESSAGE: Fixed wrong method definition in RepBBS
+[2026-01-25 20:35:01] GENERATED MESSAGE: buss/bus: make it easier to retrieve reppresences
+[2026-01-25 20:35:01] ==================================================
+
+[2026-01-25 20:35:06] Checkpoint saved at step 33000
+[2026-01-25 20:38:12] 
+==================================================
+[2026-01-25 20:38:12] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:38:12] DIFF:
+FILE: moderator/admin.py
+@@ -74,7 +74,7 @@ class CommentAdmin(DjangoCommentsAdmin):
+         For proxy models with cls apptribute limit comments to those classified as cls.
+         """
+         qs = super(CommentAdmin, self).queryset(request)
+-        qs = qs.filter(user__is_staff=False)
++        qs = qs.filter(user__is_staff=False, is_removed=False)
+         cls = getattr(self, 'cls', None)
+         if cls:
+             qs = qs.filter(classifiedcomment__cls=self.cls)
+[2026-01-25 20:38:12] 
+ACTUAL MESSAGE: dont show spam comments in moderation view
+[2026-01-25 20:38:12] GENERATED MESSAGE: Added removal of comment as a filter in the admin. (Noqa: F4)
+[2026-01-25 20:38:12] ==================================================
+
+[2026-01-25 20:38:17] Checkpoint saved at step 33500

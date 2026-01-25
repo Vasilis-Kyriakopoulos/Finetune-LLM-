@@ -49,32 +49,32 @@ def clean_text(text):
     return text.strip()
 
 
-class CodeDiffMessageDataset(Dataset):
-    def __init__(self, data, tokenizer,max_length=512):
-        self.data = data
-        self.tokenizer = tokenizer
-        self.max_length = 512
+def prepare_and_save_data(df, tokenizer, filename):
+    tokenized_data = []
+    print(f"Starting pre-tokenization for {filename}...")
+    
+    for _, row in tqdm(df.iterrows(), total=len(df)):
 
+        clean_diff = clean_text(row['diff'])
+        clean_msg = clean_text(row['message'])
+        full_text = f"<|endoftext|>DIFF:\n{clean_diff}\n\nCOMMIT MESSAGE:\n{clean_msg}<|endoftext|>"
+        
+        ids = tokenizer.encode(full_text, max_length=512, truncation=True)
+        tokenized_data.append(ids)
+    
+    torch.save(tokenized_data, filename)
+    print(f"Saved tokenized data to {filename}")
+    return tokenized_data
+
+class CodeDiffMessageDataset(Dataset):
+    def __init__(self, tokenized_list):
+        self.data = tokenized_list
 
     def __getitem__(self, index):
-        entry = self.data.iloc[index]
-        
-        # Clean the components
-        clean_diff = clean_text(entry['diff'])
-        clean_msg = clean_text(entry['message'])
-
-        # Structure: <|endoftext|> DIFF: ... MESSAGE: ... <|endoftext|>
-        prompt = f"<|endoftext|>DIFF:\n{clean_diff}\n\nCOMMIT MESSAGE:\n"
-        full_text = f"{prompt}{clean_msg}<|endoftext|>"
-
-        encoded_full = self.tokenizer.encode(full_text, max_length=self.max_length, truncation=True)
-        encoded_prompt = self.tokenizer.encode(prompt, max_length=self.max_length, truncation=True)
-        
-        return  encoded_full
-
+        return torch.tensor(self.data[index])
 
     def __len__(self):
-        return int(len(self.data))
+        return len(self.data)
 
 
 def custom_collate_fn(
@@ -89,13 +89,11 @@ def custom_collate_fn(
     inputs_lst, targets_lst = [], []
 
     for item in batch:
-        new_item = item.copy()
+        new_item = item.tolist()
         # Add an <|endoftext|> token
         new_item += [pad_token_id]
         # Pad sequences to max_length
-        padded = (
-            new_item + [pad_token_id] *
-            (batch_max_length - len(new_item))
+        padded = ( new_item + [pad_token_id] *  (batch_max_length - len(new_item))
         )
         inputs = torch.tensor(padded[:-1])  # Truncate the last token for inputs
         targets = torch.tensor(padded[1:])  # Shift +1 to the right for targets
@@ -109,6 +107,9 @@ def custom_collate_fn(
 
         inputs_lst.append(inputs)
         targets_lst.append(targets)
+
+    inputs_tensor = torch.stack(inputs_lst)
+    targets_tensor = torch.stack(targets_lst)
 
     return inputs_tensor, targets_tensor
 
@@ -159,18 +160,18 @@ def generate(model, tokenizer, device,val_df):
     model.train()
 
 # --- 2. Training Step ---
-def train_one_epoch(model, dataloader, optimizer, device, progress_bar, tokenizer,scheduler,val_df,start_epoch,epoch,global_step):
+def train_one_epoch(model, dataloader, optimizer,scaler, device, progress_bar, tokenizer,scheduler,val_df,start_epoch,epoch,global_step,best_val_loss,bad_epochs):
     model.train()
     total_loss = 0
     total_acc = 0
-    
+    steps_to_skip = global_step % len(dataloader)
+    if epoch == start_epoch and steps_to_skip > 0:
+        progress_bar.update(steps_to_skip) 
 
     for i, (x, y) in enumerate(dataloader):
         if (epoch == start_epoch) and (i < (global_step % len(dataloader))):
-            progress_bar.update(1)
             continue
-
-        
+     
         x = x.to(device)
         y = y.to(device)
 
@@ -183,15 +184,19 @@ def train_one_epoch(model, dataloader, optimizer, device, progress_bar, tokenize
             y.view(-1)
         )
         acc = calculate_accuracy(logits, y)
-        loss.backward()
-        optimizer.step()
+     #  loss.backward()
+        scaler.scale(loss).backward()
+
+        #optimizer.step()
+        scaler.step(optimizer)
+        scaler.update()
         scheduler.step()
 
         total_loss += loss.item()
         total_acc += acc
 
         progress_bar.update(1)
-        progress_bar.set_postfix({"train_loss": f"{loss.item():.4f}","train_acc": f"{acc:.4f}","lr": f"{scheduler.get_last_lr()[0]:.2e}"})
+        progress_bar.set_postfix({"train_loss": f"{loss.item():.4f}","train_acc": f"{acc:.4f}","lr": f"{scheduler.get_last_lr()[0]:.2e}"},refresh = False)
 
         global_step += 1
         if global_step > 0 and global_step % 500 == 0:
@@ -201,7 +206,10 @@ def train_one_epoch(model, dataloader, optimizer, device, progress_bar, tokenize
                     'global_step': global_step,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
-                    'scheduler_state_dict': scheduler.state_dict()
+                    'scheduler_state_dict': scheduler.state_dict(),
+                    'scaler_state_dict': scaler.state_dict(),
+                    'best_val_loss': best_val_loss,
+                    'bad_epochs': bad_epochs
                 }
             torch.save(checkpoint, "latest_checkpoint.pt")
             log_text(f"Checkpoint saved at step {global_step}")
@@ -231,7 +239,7 @@ def evaluate(model, dataloader, device,progress_bar):
             val_acc = calculate_accuracy(logits, y)
             total_acc  += val_acc
             progress_bar.update(1)
-            progress_bar.set_postfix({"val_loss": f"{loss.item():.4f}", "val_accuracy": f"{val_acc:.4f}"})
+            progress_bar.set_postfix({"val_loss": f"{loss.item():.4f}", "val_accuracy": f"{val_acc:.4f}"},refresh = False)
 
 
     avg_loss = total_loss / len(dataloader)
@@ -240,7 +248,7 @@ def evaluate(model, dataloader, device,progress_bar):
 
 
 # --- 4. Main Loop ---
-def train(model, train_loader, val_loader, optimizer,scheduler, device, tokenizer,epochs,val_df):
+def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, tokenizer,epochs,val_df):
     best_val_loss = float("inf")
     patience = 2
     bad_epochs = 0
@@ -252,14 +260,21 @@ def train(model, train_loader, val_loader, optimizer,scheduler, device, tokenize
     if os.path.exists(checkpoint_path):
         log_text(f"Loading checkpoint: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path)
-        
+
+
+        best_val_loss = checkpoint.get('best_val_loss', float("inf"))
+        bad_epochs = checkpoint.get('bad_epochs', 0)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        scaler.load_state_dict(checkpoint['scaler_state_dict'])
         
         start_epoch = checkpoint['epoch']
         global_step = checkpoint['global_step']
-        log_text(f"Resuming from Epoch {start_epoch}, Global Step {global_step}")
+        log_text(f"Resuming from Epoch {start_epoch+1}, Global Step {global_step}")
+        log_text(f"Resuming with Best Val Loss = {best_val_loss:.4f}")
+        log_text(f"Resuming with number of bad epochs = {bad_epochs:.4f}")
+
 
     for epoch in range(start_epoch,epochs):
 
@@ -274,7 +289,8 @@ def train(model, train_loader, val_loader, optimizer,scheduler, device, tokenize
         # Train
         train_loss,train_acc,global_step = train_one_epoch(model, 
                                                           train_loader,    
-                                                          optimizer, 
+                                                          optimizer,
+                                                          scaler, 
                                                           device, 
                                                           progress_bar, 
                                                           tokenizer,
@@ -282,7 +298,9 @@ def train(model, train_loader, val_loader, optimizer,scheduler, device, tokenize
                                                           val_df,
                                                           start_epoch,
                                                           epoch,
-                                                          global_step
+                                                          global_step,
+                                                          best_val_loss,
+                                                          bad_epochs
                                                           )
 
         # Evaluate
@@ -339,38 +357,50 @@ def log_text(message):
 
 
 def start():
+
+
     main_path = "data/"
     os.makedirs(main_path, exist_ok=True)
-    train_df = pd.read_csv(main_path + "commitbench_train_10pct.csv")
-    val_df = pd.read_csv(main_path + "commitbench_validation_10pct.csv")
-    log_text(f"Length Train:{len(train_df)}")
-    log_text(f"Length Val:{len(val_df)}")
-
-    train_df = train_df[train_df["diff"].str.len() < 1000].reset_index(drop=True)
-    val_df = val_df[val_df["diff"].str.len() < 1000].reset_index(drop=True)
-    train_df = train_df[~train_df['message'].str.contains('^Fixes #', na=False)]
-
-    log_text(f"New Length Train: {len(train_df)}")
-    log_text(f"New Length Val: {len(val_df)}")
-
-
-    num_workers = 0
-    batch_size = 4
-
-    torch.manual_seed(123)
-    torch.cuda.manual_seed_all(seed)
+    train_cache = main_path +  "train_tokenized_10pct.pt"
+    val_cache = main_path+ "val_tokenized_10pct.pt"
     model_name = "gpt2"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    train_dataset = CodeDiffMessageDataset(train_df, tokenizer)
-    val_dataset = CodeDiffMessageDataset(val_df, tokenizer)
+    val_df = pd.read_csv(main_path + "commitbench_validation_10pct.csv")
+    if os.path.exists(train_cache) and os.path.exists(val_cache):
+        log_text("Loading tokenized data from cache...")
+        train_tokenized = torch.load(train_cache)
+        val_tokenized = torch.load(val_cache)
+    else:
+        log_text("Tokenized cache not found. Processing CSVs...")
+        train_df = pd.read_csv(main_path + "commitbench_train_10pct.csv")
+        val_df = pd.read_csv(main_path + "commitbench_validation_10pct.csv")
+        log_text(f"Length Train:{len(train_df)}")
+        log_text(f"Length Val:{len(val_df)}")
+
+        train_df = train_df[train_df["diff"].str.len() < 1000].reset_index(drop=True)
+        val_df = val_df[val_df["diff"].str.len() < 1000].reset_index(drop=True)
+        train_df = train_df[~train_df['message'].str.contains('^Fixes #', na=False)]
+
+        log_text(f"New Length Train: {len(train_df)}")
+        log_text(f"New Length Val: {len(val_df)}")
+        train_tokenized = prepare_and_save_data(train_df, tokenizer, train_cache)
+        val_tokenized = prepare_and_save_data(val_df, tokenizer, val_cache)
+
+    train_dataset = CodeDiffMessageDataset(train_tokenized)
+    val_dataset = CodeDiffMessageDataset(val_tokenized)
+    num_workers = 0
+    batch_size = 4
+    seed = 123
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         collate_fn=custom_collate_fn,
-        shuffle=False,
+        shuffle=True,
         drop_last=True,
-        num_workers=num_workers
-        pin_memory=True
+        num_workers=num_workers,
+        pin_memory = True
     )
     val_loader = DataLoader(
         val_dataset,
@@ -378,8 +408,8 @@ def start():
         collate_fn=custom_collate_fn,
         shuffle= False,
         drop_last=True,
-        num_workers=num_workers
-        pin_memory=True
+        num_workers=num_workers,
+        pin_memory = True
     )
 
 
@@ -404,7 +434,8 @@ def start():
         num_warmup_steps=num_warmup_steps, 
         num_training_steps=num_training_steps
     )
-    train(model, train_loader, val_loader, optimizer, scheduler ,device, tokenizer,epochs,val_df)
+    scaler = torch.amp.GradScaler() 
+    train(model, train_loader, val_loader, optimizer, scaler,scheduler ,device, tokenizer,epochs,val_df)
 
 if __name__ == "__main__":
     start()

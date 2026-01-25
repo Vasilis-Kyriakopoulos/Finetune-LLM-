@@ -1600,3 +1600,385 @@ ACTUAL MESSAGE: dont show spam comments in moderation view
 [2026-01-25 20:38:12] ==================================================
 
 [2026-01-25 20:38:17] Checkpoint saved at step 33500
+[2026-01-25 20:41:25] 
+==================================================
+[2026-01-25 20:41:25] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:41:25] DIFF:
+FILE: app/models/role_mapper.rb
+@@ -4,7 +4,4 @@ class RoleMapper
+     return [] unless u
+     u.groups
+   end
+-
+-
+ end
+-
+FILE: spec/models/role_mapper_spec.rb
+@@ -3,7 +3,7 @@ require 'spec_helper'
+ describe RoleMapper do
+   before do
+     @user = FactoryGirl.create(:user)
+-    ScholarSphere::LDAP.stubs(:groups_for_user).with(@user.login).returns(["umg/up.dlt.gamma-ci", "umg/up.dlt.redmine"])
++    User.any_instance.stubs(:groups).returns(["umg/up.dlt.gamma-ci", "umg/up.dlt.redmine"])
+   end
+   subject {::RoleMapper.roles(@user.login)}
+   it { should == ["umg/up.dlt.gamma-ci", "umg/up.dlt.redmine"]}
+[2026-01-25 20:41:25] 
+ACTUAL MESSAGE: abstracts RoleMapper test so it's not dependent on our LDAP implementation particulars -- it's breaking the jenkins build
+[2026-01-25 20:41:25] GENERATED MESSAGE: removed old ruby code from role_mapper_spec
+[2026-01-25 20:41:25] ==================================================
+
+[2026-01-25 20:41:30] Checkpoint saved at step 34000
+[2026-01-25 20:44:37] 
+==================================================
+[2026-01-25 20:44:37] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:44:37] DIFF:
+FILE: dist/moon.js
+@@ -1842,7 +1842,7 @@
+       return this.$data[method].apply(this, args);
+     }
+-    // Event Emitter, adapted from 
++    // Event Emitter, adapted from 
+     /**
+      * Attaches an Event Listener
+FILE: src/instance/methods.js
+@@ -79,7 +79,7 @@ Moon.prototype.callMethod = function(method, args) {
+   return this.$data[method].apply(this, args);
+ }
+-// Event Emitter, adapted from 
++// Event Emitter, adapted from 
+ /**
+  * Attaches an Event Listener
+[2026-01-25 20:44:37] 
+ACTUAL MESSAGE: fix: update username when referring to voke
+[2026-01-25 20:44:37] GENERATED MESSAGE: Bugfix: removed unused reference to module
+The module was changed to include the module within angular-angular-sunlight and also added a new reference to that module in sunlight which does not provide
+[2026-01-25 20:44:37] ==================================================
+
+[2026-01-25 20:44:41] Checkpoint saved at step 34500
+[2026-01-25 20:47:50] 
+==================================================
+[2026-01-25 20:47:50] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:47:50] DIFF:
+FILE: src/Context.php
+@@ -457,7 +457,7 @@ abstract class Context
+             $context = self::$contextPrefix . $context;
+         }
+         if (!class_exists($context)) {
+-            throw new LoaderException(
++            throw @new LoaderException(
+                 'Specified context ("' . $context . '") does not exist.',
+                 $context
+             );
+[2026-01-25 20:47:50] 
+ACTUAL MESSAGE: Silent warnings from creating exception
+Apparently this can lead to strange errors on some setups:
+    Accessing static property Exception::$trace as non static
+Fixes <URL>
+[2026-01-25 20:47:50] GENERATED MESSAGE: Refactor Context::load() to include @load method
+[2026-01-25 20:47:50] ==================================================
+
+[2026-01-25 20:47:54] Checkpoint saved at step 35000
+[2026-01-25 20:51:01] 
+==================================================
+[2026-01-25 20:51:01] TEST ON RANDOM VAL DIFF:
+[2026-01-25 20:51:01] DIFF:
+FILE: drools-core/src/main/java/org/drools/impl/StatelessKnowledgeSessionImpl.java
+@@ -285,6 +285,7 @@ public class StatelessKnowledgeSessionImpl
+             }
+         } finally {
+             ((StatefulKnowledgeSessionImpl) ksession).session.endBatchExecution();
++            ksession.dispose();
+         }
+     }
+[2026-01-25 20:51:01] 
+ACTUAL MESSAGE: [JBRULES-] dispose the ksession after having executed a command on the stateless session
+[2026-01-25 20:51:01] GENERATED MESSAGE: remove the session before we dispose it
+[2026-01-25 20:51:01] ==================================================
+
+[2026-01-25 20:51:05] Checkpoint saved at step 35500
+[2026-01-25 20:53:25] Length Train:116521
+[2026-01-25 20:53:25] Length Val:24969
+[2026-01-25 20:53:25] New Length Train: 92181
+[2026-01-25 20:53:25] New Length Val: 19706
+[2026-01-25 20:53:26] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 20:53:30] Resuming from Epoch 1, Global Step 35500
+[2026-01-25 20:53:57] Length Train:116521
+[2026-01-25 20:53:57] Length Val:24969
+[2026-01-25 20:53:57] New Length Train: 92181
+[2026-01-25 20:53:57] New Length Val: 19706
+[2026-01-25 20:53:58] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 20:53:59] Resuming from Epoch 1, Global Step 35500
+[2026-01-25 20:55:58] Length Train:116521
+[2026-01-25 20:55:58] Length Val:24969
+[2026-01-25 20:55:58] New Length Train: 92181
+[2026-01-25 20:55:58] New Length Val: 19706
+[2026-01-25 20:55:59] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 20:56:00] Resuming from Epoch 2, Global Step 35500
+[2026-01-25 20:56:46] Length Train:116521
+[2026-01-25 20:56:46] Length Val:24969
+[2026-01-25 20:56:46] New Length Train: 92181
+[2026-01-25 20:56:46] New Length Val: 19706
+[2026-01-25 20:56:47] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 20:56:48] Resuming from Epoch 2, Global Step 35500
+[2026-01-25 20:57:09] Length Train:116521
+[2026-01-25 20:57:09] Length Val:24969
+[2026-01-25 20:57:09] New Length Train: 92181
+[2026-01-25 20:57:09] New Length Val: 19706
+[2026-01-25 20:57:10] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 20:57:11] Resuming from Epoch 2, Global Step 35500
+[2026-01-25 21:01:28] 
+==================================================
+[2026-01-25 21:01:28] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:01:28] DIFF:
+FILE: sharepoint/lists/__init__.py
+@@ -89,7 +89,7 @@ class SharePointList(object):
+     @property
+     def rows(self):
+         if not hasattr(self, '_rows'):
+-            xml = SP.GetListItems(SP.listName(self.id))
++            xml = SP.GetListItems(SP.listName(self.id), SP.rowLimit("100000"))
+             response = self.opener.post_soap(LIST_WEBSERVICE, xml)
+             xml_rows = list(response[0][0][0])
+             self._rows = []
+[2026-01-25 21:01:28] 
+ACTUAL MESSAGE: Retrieve up to 1 million rows (all in one go).
+[2026-01-25 21:01:28] GENERATED MESSAGE: fixed # by checking for a number of integers insteadOf
+[2026-01-25 21:01:28] ==================================================
+
+[2026-01-25 21:01:33] Checkpoint saved at step 36000
+[2026-01-25 21:04:43] 
+==================================================
+[2026-01-25 21:04:43] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:04:43] DIFF:
+FILE: src/Translator.js
+@@ -96,7 +96,9 @@ class Translator extends EventEmitter {
+         let copy = (resType === '[object Array]') ? [] : {}; // apply child translation on a copy
+         for (let m in res) {
+-          copy[m] = this.translate(`${key}${keySeparator}${m}`, {...options, ...{joinArrays: false, ns: namespaces}});
++          if(res.hasOwnProperty(m)) {
++            copy[m] = this.translate(`${key}${keySeparator}${m}`, {...options, ...{joinArrays: false, ns: namespaces}});
++          }
+         }
+         res = copy;
+       }
+[2026-01-25 21:04:43] 
+ACTUAL MESSAGE: Fix: iterating over object's own properties
+[2026-01-25 21:04:43] GENERATED MESSAGE: Remove duplicate "convert to arrays" check.
+[2026-01-25 21:04:43] ==================================================
+
+[2026-01-25 21:04:47] Checkpoint saved at step 36500
+[2026-01-25 21:07:57] 
+==================================================
+[2026-01-25 21:07:57] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:07:57] DIFF:
+FILE: pkg/apiserver/apiserver.go
+@@ -345,6 +345,7 @@ func (server *APIServer) notFound(w http.ResponseWriter, req *http.Request) {
+ }
+ func (server *APIServer) write(statusCode int, object interface{}, w http.ResponseWriter) {
++	w.Header().Set("Content-Type", "application/json")
+ 	w.WriteHeader(statusCode)
+ 	output, err := api.Encode(object)
+ 	if err != nil {
+[2026-01-25 21:07:57] 
+ACTUAL MESSAGE: Write JSON content type for API responses
+[2026-01-25 21:07:57] GENERATED MESSAGE: apiserver: properly encode content-type header for JSON output
+[2026-01-25 21:07:57] ==================================================
+
+[2026-01-25 21:08:02] Checkpoint saved at step 37000
+[2026-01-25 21:09:54] Length Train:116521
+[2026-01-25 21:09:54] Length Val:24969
+[2026-01-25 21:09:54] New Length Train: 92181
+[2026-01-25 21:09:54] New Length Val: 19706
+[2026-01-25 21:09:55] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:10:00] Resuming from Epoch 2, Global Step 37000
+[2026-01-25 21:10:00] Resuming with Best Val Loss: inf
+[2026-01-25 21:14:34] 
+==================================================
+[2026-01-25 21:14:34] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:14:34] DIFF:
+FILE: opan/hess.py
+@@ -1262,7 +1262,7 @@ class OrcaHess(SuperOpanHess):
+         #=== IR Spectrum ===#
+         # If dipole derivs absent or munged, or if block missing, then skip
+         m_work = self.Pat.ir_block.search(self.in_str)
+-        if None in [self.dipders, m_work]:
++        if self.dipders is None or m_work is None:
+             self.ir_comps = None
+             self.ir_mags = None
+         else:
+@@ -1343,7 +1343,7 @@ class OrcaHess(SuperOpanHess):
+         # If polarizability derivs absent or munged, or if block missing,
+         #  then skip
+         m_work = self.Pat.raman_block.search(self.in_str)
+-        if None in [self.polders, m_work]:
++        if self.polders is None or m_work is None:
+             self.raman_acts = None
+             self.raman_depols = None
+         else:
+[2026-01-25 21:14:34] 
+ACTUAL MESSAGE: FUTURE: Fixed 'if None in [...]'
+... because of FutureWarning being raised, by converting to explicit
+  object comparisons to None. Ok for these two instances in hess.py, since
+  there are only two comparisons, but for larger numbers of comparisons
+  something more elegant will be warranted.
+[2026-01-25 21:14:34] GENERATED MESSAGE: BUGFIX (IRspectral=0x1e9e2): Minor fix (#) The ir spectrum not being taken into account during the computation of Kirksha's test results on substrates
+[2026-01-25 21:14:34] ==================================================
+
+[2026-01-25 21:14:38] Checkpoint saved at step 37500
+[2026-01-25 21:15:42] Length Train:116521
+[2026-01-25 21:15:42] Length Val:24969
+[2026-01-25 21:15:42] New Length Train: 92181
+[2026-01-25 21:15:42] New Length Val: 19706
+[2026-01-25 21:15:43] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:15:47] Resuming from Epoch 2, Global Step 37500
+[2026-01-25 21:15:47] Resuming with Best Val Loss = inf
+[2026-01-25 21:15:47] Resuming with number of bad epochs = inf
+[2026-01-25 21:16:18] Length Train:116521
+[2026-01-25 21:16:18] Length Val:24969
+[2026-01-25 21:16:19] New Length Train: 92181
+[2026-01-25 21:16:19] New Length Val: 19706
+[2026-01-25 21:16:20] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:16:21] Resuming from Epoch 2, Global Step 37500
+[2026-01-25 21:16:21] Resuming with Best Val Loss = inf
+[2026-01-25 21:16:21] Resuming with number of bad epochs = 0.0000
+[2026-01-25 21:19:17] Length Train:116521
+[2026-01-25 21:19:17] Length Val:24969
+[2026-01-25 21:19:17] New Length Train: 92181
+[2026-01-25 21:19:17] New Length Val: 19706
+[2026-01-25 21:19:18] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:19:19] Resuming from Epoch 2, Global Step 37500
+[2026-01-25 21:19:19] Resuming with Best Val Loss = inf
+[2026-01-25 21:19:19] Resuming with number of bad epochs = 0.0000
+[2026-01-25 21:23:44] 
+==================================================
+[2026-01-25 21:23:44] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:23:44] DIFF:
+FILE: charmhelpers/core/host.py
+@@ -568,7 +568,7 @@ def write_file(path, content, owner='root', group='root', perms=0o444):
+     if existing_perms != perms:
+         log("Changing permissions on existing content: {} -> {}"
+             .format(existing_perms, perms), level=DEBUG)
+-        os.chown(path, perms)
++        os.chmod(path, perms)
+ def fstab_remove(mp):
+FILE: tests/core/test_host.py
+@@ -1152,8 +1152,8 @@ class HelpersTest(TestCase):
+             os_.chown.assert_has_calls([
+                 call(path, uid, -1),
+                 call(path, -1, gid),
+-                call(path, perms),
+             ])
++            os_.chmod.assert_called_with(path, perms)
+     @patch.object(host, 'log')
+     @patch.object(host, 'os')
+[2026-01-25 21:23:44] 
+ACTUAL MESSAGE: core/host: fix changing permissions in write_file (#)
+[2026-01-25 21:23:44] GENERATED MESSAGE: chore: chmod permissions when no previous one was
+Chord has no `permission` set. This will happen with a change of environment in which only the root permission is changed for that
+[2026-01-25 21:23:44] ==================================================
+
+[2026-01-25 21:23:49] Checkpoint saved at step 38000
+[2026-01-25 21:26:57] 
+==================================================
+[2026-01-25 21:26:57] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:26:57] DIFF:
+FILE: src/NavitiaIoApiService.php
+@@ -75,4 +75,17 @@ class NavitiaIoApiService
+         return json_decode((string) $response->getBody());
+     }
++
++    /**
++     * Get all users.
++     *
++     * @return \stdClass
++     */
++    public function findUsersBetweenDates($startDate, $endDate)
++    {
++        $query = ['start_date' => $startDate, 'end_date' => $endDate];
++        $response = $this->client->get('api/users', ['query' => $query]);
++
++        return json_decode((string) $response->getBody());
++    }
+ }
+[2026-01-25 21:26:57] 
+ACTUAL MESSAGE: New function added in NavitiaIoApiService to get Users between dates
+[2026-01-25 21:26:57] GENERATED MESSAGE: Add a method to the database for finding users
+[2026-01-25 21:26:57] ==================================================
+
+[2026-01-25 21:27:01] Checkpoint saved at step 38500
+[2026-01-25 21:30:16] 
+==================================================
+[2026-01-25 21:30:16] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:30:16] DIFF:
+FILE: demo/guide-python/custom_objective.py
+@@ -43,7 +43,7 @@ def evalerror(preds, dtrain):
+ py_evals_result = {}
+ # training with customized objective, we can also do step by step training
+-# simply look at xgboost.py's implementation of train
++# simply look at training.py's implementation of train
+ py_params = param.copy()
+ py_params.update({'disable_default_eval_metric': True})
+ py_logreg = xgb.train(py_params, dtrain, num_round, watchlist, obj=logregobj,
+[2026-01-25 21:30:16] 
+ACTUAL MESSAGE: Fix a comment in demo to use correct reference (#)
+[2026-01-25 21:30:16] GENERATED MESSAGE: Removed missing 'disable_default_eval_metrics' in customObjective demo (#)
+[2026-01-25 21:30:16] ==================================================
+
+[2026-01-25 21:30:21] Checkpoint saved at step 39000
+[2026-01-25 21:31:16] Tokenized cache not found. Processing CSVs...
+[2026-01-25 21:31:18] Length Train:116521
+[2026-01-25 21:31:18] Length Val:24969
+[2026-01-25 21:31:18] New Length Train: 92181
+[2026-01-25 21:31:18] New Length Val: 19706
+[2026-01-25 21:31:51] Tokenized cache not found. Processing CSVs...
+[2026-01-25 21:31:53] Length Train:116521
+[2026-01-25 21:31:53] Length Val:24969
+[2026-01-25 21:31:53] New Length Train: 92181
+[2026-01-25 21:31:53] New Length Val: 19706
+[2026-01-25 21:33:44] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:33:49] Resuming from Epoch 2, Global Step 39000
+[2026-01-25 21:33:49] Resuming with Best Val Loss = inf
+[2026-01-25 21:33:49] Resuming with number of bad epochs = 0.0000
+[2026-01-25 21:38:35] Loading tokenized data from cache...
+[2026-01-25 21:40:42] Loading tokenized data from cache...
+[2026-01-25 21:41:18] Loading checkpoint: latest_checkpoint.pt
+[2026-01-25 21:41:19] Resuming from Epoch 2, Global Step 39000
+[2026-01-25 21:41:19] Resuming with Best Val Loss = inf
+[2026-01-25 21:41:19] Resuming with number of bad epochs = 0.0000
+[2026-01-25 21:44:44] 
+==================================================
+[2026-01-25 21:44:44] TEST ON RANDOM VAL DIFF:
+[2026-01-25 21:44:44] DIFF:
+FILE: src/models/Builder/SubscriptionTypeBuilder.php
+@@ -299,15 +299,13 @@ class SubscriptionTypeBuilder extends Builder
+             ]);
+         }
+-        if (count($this->metaItems)) {
+-            foreach ($this->metaItems as $key => $value) {
+-                $this->database->table($this->metaTableName)->insert([
+-                    'subscription_type_id' => $subscriptionType->id,
+-                    'key' => $key,
+-                    'value' => $value,
+-                    'sorting' => 100,
+-                ]);
+-            }
++        foreach ($this->metaItems as $key => $value) {
++            $this->database->table($this->metaTableName)->insert([
++                'subscription_type_id' => $subscriptionType->id,
++                'key' => $key,
++                'value' => $value,
++                'sorting' => 100,
++            ]);
+         }
+         return $subscriptionType;
+[2026-01-25 21:44:44] 
+ACTUAL MESSAGE: arpu graph fixes from remp/crm!
+remp/crm#
+- tabs instead of pills in payment stats submenu
+- fix missing translations
+- hide arpu tab if user is not allowed
+[2026-01-25 21:44:44] GENERATED MESSAGE: Fix subtypes when getting a few key values from the table
+[2026-01-25 21:44:44] ==================================================
+
+[2026-01-25 21:44:49] Checkpoint saved at step 39500

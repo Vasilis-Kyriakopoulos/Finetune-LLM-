@@ -2598,3 +2598,3499 @@ git-svn-id: svn+ssh://src.earth.threerings.net/narya/trunk@ f4-e9--aa3c-eee0fcfb
 [2026-01-25 23:16:19] Resuming from Epoch 3, Global Step 51000
 [2026-01-25 23:16:19] Resuming with Best Val Loss = 1.4399
 [2026-01-25 23:16:19] Resuming with number of bad epochs = 0.0000
+[2026-01-26 23:07:44] Loading tokenized data from cache...
+[2026-01-26 23:08:19] Loading checkpoint: latest_checkpoint.pt
+[2026-01-26 23:08:23] Resuming from Epoch 3, Global Step 51000
+[2026-01-26 23:08:23] Resuming with Best Val Loss = 1.4399
+[2026-01-26 23:08:23] Resuming with number of bad epochs = 0.0000
+[2026-01-26 23:11:36] 
+==================================================
+[2026-01-26 23:11:36] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:11:36] DIFF:
+FILE: lib/sfnt.js
+@@ -38,13 +38,13 @@ var Font = function () {
+ //getters
+   this.__defineGetter__('avgCharWidth', function () {
+-    if (this.glyphs.length == 0) {
++    if (this.glyphs.length === 0) {
+       return 0;
+     }
+     var widths = _.map(this.glyphs, 'width');
+     return parseInt(widths.reduce(function(prev, cur) {
+       return prev + cur;
+-    }) / widths.length);
++    }) / widths.length, 10);
+   });
+ };
+[2026-01-26 23:11:36] 
+ACTUAL MESSAGE: Minor changes accordingly to LINT rules.
+[2026-01-26 23:11:36] GENERATED MESSAGE: fix(fonts): fix typo in getter
+[2026-01-26 23:11:36] ==================================================
+
+[2026-01-26 23:11:41] Checkpoint saved at step 51500
+[2026-01-26 23:14:50] 
+==================================================
+[2026-01-26 23:14:50] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:14:50] DIFF:
+FILE: lib/geometry/polygon.rb
+@@ -65,7 +65,7 @@ An object representing a closed set of vertices and edges.
+ 	    end
+ 	    # Close the polygon if needed
+-	    @edges.push Edge.new(@edges.last.last, @edges.first.first) unless @edges.last.last == @edges.first.first
++	    @edges.push Edge.new(@edges.last.last, @edges.first.first) unless @edges.empty? || (@edges.last.last == @edges.first.first)
+ 	end
+ 	private
+[2026-01-26 23:14:50] 
+ACTUAL MESSAGE: Don't try to close polygons without any edges
+[2026-01-26 23:14:50] GENERATED MESSAGE: Don't push edges if they're empty.
+[2026-01-26 23:14:50] ==================================================
+
+[2026-01-26 23:14:55] Checkpoint saved at step 52000
+[2026-01-26 23:18:05] 
+==================================================
+[2026-01-26 23:18:05] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:18:05] DIFF:
+FILE: lib/Doctrine/ORM/EntityRepository.php
+@@ -204,11 +204,6 @@ class EntityRepository implements ObjectRepository
+             );
+         }
+-        if ( !isset($arguments[0])) {
+-            // we dont even want to allow null at this point, because we cannot (yet) transform it into IS NULL.
+-            throw ORMException::findByRequiresParameter($method.$by);
+-        }
+-
+         $fieldName = lcfirst(\Doctrine\Common\Util\Inflector::classify($by));
+         if ($this->_class->hasField($fieldName) || $this->_class->hasAssociation($fieldName)) {
+[2026-01-26 23:18:05] 
+ACTUAL MESSAGE: we can (now) transform it into IS NULL
+[2026-01-26 23:18:05] GENERATED MESSAGE: Remove null check from entity repository
+We don't need to check if the entity is null.
+[2026-01-26 23:18:05] ==================================================
+
+[2026-01-26 23:18:10] Checkpoint saved at step 52500
+[2026-01-26 23:21:17] 
+==================================================
+[2026-01-26 23:21:17] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:21:17] DIFF:
+FILE: clair/clair.go
+@@ -43,7 +43,7 @@ func New(url string, debug bool) (*Clair, error) {
+ 	registry := &Clair{
+ 		URL: url,
+ 		Client: &http.Client{
+-			Timeout:   time.Minute,
++			Timeout:   5 * time.Minute,
+ 			Transport: errorTransport,
+ 		},
+ 		Logf: logf,
+[2026-01-26 23:21:17] 
+ACTUAL MESSAGE: clair: increase HTTP client timeout to 5 minutes (#)
+- allow for big layers (e.g. MB) to upload before timing out
+[2026-01-26 23:21:17] GENERATED MESSAGE: clair: increase timeout to  seconds
+[2026-01-26 23:21:17] ==================================================
+
+[2026-01-26 23:21:22] Checkpoint saved at step 53000
+[2026-01-26 23:24:30] 
+==================================================
+[2026-01-26 23:24:30] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:24:30] DIFF:
+FILE: spec/base_spec.rb
+@@ -5,12 +5,19 @@ describe GitBlame::Base do
+       should have(3).authors
+     end
+-    it "should respond to commits" do
+-      subject.authors.first.commits.should > 0
+-    end
++    describe "author" do
++      let(:author) { subject.authors.first }
++      it "should respond to commits" do
++        author.commits.should > 0
++      end
++
++      it "should respond to name" do
++        author.name.length.should > 0
++      end
+-    it "should respond to name" do
+-      subject.authors.first.name.length.should > 0
++      it "should have a number of locs" do
++        author.loc.should > 0
++      end
+     end
+   end
+[2026-01-26 23:24:30] 
+ACTUAL MESSAGE: Implement GitBlame::Base#loc, commits and files
+[2026-01-26 23:24:30] GENERATED MESSAGE: Add spec for author#first
+[2026-01-26 23:24:30] ==================================================
+
+[2026-01-26 23:24:35] Checkpoint saved at step 53500
+[2026-01-26 23:27:41] 
+==================================================
+[2026-01-26 23:27:41] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:27:41] DIFF:
+FILE: src/Profiler/Profiler.php
+@@ -163,6 +163,17 @@ class Profiler implements LoggerAwareInterface {
+ 	}
+ 	/**
++	 * An alias of "getElapsedTime" for backwards compatibility.
++	 *
++	 * @param  string  $timer
++	 * @return double
++	 */
++	public function getTimer($timer)
++	{
++		return $this->getElapsedTime($timer);
++	}
++
++	/**
+ 	 * Get all of the executed timers.
+ 	 *
+ 	 * @return array
+[2026-01-26 23:27:41] 
+ACTUAL MESSAGE: Added `getTimer` back for backwards compatibility
+[2026-01-26 23:27:41] GENERATED MESSAGE: Add getter to profiler for backward compatibility (#)
+[2026-01-26 23:27:41] ==================================================
+
+[2026-01-26 23:27:46] Checkpoint saved at step 54000
+[2026-01-26 23:30:55] 
+==================================================
+[2026-01-26 23:30:55] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:30:55] DIFF:
+FILE: lib/api-versions/middleware.rb
+@@ -6,6 +6,7 @@ module ApiVersions
+     def call(env)
+       return @app.call(env) unless env['HTTP_ACCEPT']
++      env['HTTP_ACCEPT'] += ",application/vnd.#{ApiVersions::VersionCheck.vendor_string}+json" unless env['HTTP_ACCEPT'].include?(ApiVersions::VersionCheck.vendor_string)
+       accepts = env['HTTP_ACCEPT'].split(',')
+       offset = 0
+[2026-01-26 23:30:55] 
+ACTUAL MESSAGE: Allow for requests without headers to default to V1
+[2026-01-26 23:30:55] GENERATED MESSAGE: Add support for JSON encoding for API versions
+[2026-01-26 23:30:55] ==================================================
+
+[2026-01-26 23:31:00] Checkpoint saved at step 54500
+[2026-01-26 23:34:07] 
+==================================================
+[2026-01-26 23:34:07] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:34:07] DIFF:
+FILE: src/Commands/MakeEloquentFilter.php
+@@ -63,7 +63,7 @@ class MakeEloquentFilter extends Command
+     {
+         if ($this->files->exists($path = $this->getPath())) {
+             $this->error("\n\n\t".$path.' Already Exists!'."\n");
+-            die;
++            exit;
+         }
+         $this->makeDirectory($path);
+@@ -71,7 +71,7 @@ class MakeEloquentFilter extends Command
+         if (! $this->files->exists($stubPath) || ! is_readable($stubPath)) {
+             $this->error(sprintf('File "%s" does not exist or is unreadable.', $stubPath));
+-            die;
++            exit;
+         }
+         $tmp = $this->applyValuesToStub($this->files->get($stubPath));
+@@ -141,7 +141,7 @@ class MakeEloquentFilter extends Command
+         if (class_exists($fqClass)) {
+             $this->error("\n\n\t$fqClass Already Exists!\n");
+-            die;
++            exit;
+         }
+         $this->setClassName($fqClass);
+[2026-01-26 23:34:07] 
+ACTUAL MESSAGE: Apply fixes from StyleCI (#)
+[2026-01-26 23:34:07] GENERATED MESSAGE: Exit with exit code 1 if file already exists.
+[2026-01-26 23:34:07] ==================================================
+
+[2026-01-26 23:34:11] Checkpoint saved at step 55000
+[2026-01-26 23:37:20] 
+==================================================
+[2026-01-26 23:37:20] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:37:20] DIFF:
+FILE: lib/import_js/js_module.rb
+@@ -100,7 +100,7 @@ module ImportJS
+     # @param make_relative_to_path [String]
+     def make_relative_to(make_relative_to_path)
+-      return unless lookup_path
++      return unless @lookup_path
+       # Prevent mutating the argument that was passed in
+       make_relative_to_path = make_relative_to_path.dup
+@@ -109,10 +109,10 @@ module ImportJS
+       make_relative_to_path.sub!("#{Dir.pwd}/", '')
+       # Ignore if the file to relate to is part of a different lookup_path
+-      return unless make_relative_to_path.start_with? lookup_path
++      return unless make_relative_to_path.start_with? @lookup_path
+       # Strip out the lookup_path
+-      make_relative_to_path.sub!(%r{^#{Regexp.escape(lookup_path)}/}, '')
++      make_relative_to_path.sub!(%r{^#{Regexp.escape(@lookup_path)}/}, '')
+       path = Pathname.new(@import_path).relative_path_from(
+         Pathname.new(File.dirname(make_relative_to_path))
+[2026-01-26 23:37:20] 
+ACTUAL MESSAGE: Use @lookup_path in JSModule
+This makes it clearer where this is coming from.
+[2026-01-26 23:37:20] GENERATED MESSAGE: Fixes #.
+This is a minor fix for #, which was introduced in #
+[2026-01-26 23:37:20] ==================================================
+
+[2026-01-26 23:37:24] Checkpoint saved at step 55500
+[2026-01-26 23:40:30] 
+==================================================
+[2026-01-26 23:40:30] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:40:30] DIFF:
+FILE: build-support/bin/packages.py
+@@ -425,10 +425,12 @@ def list_prebuilt_wheels() -> None:
+ def fetch_prebuilt_wheels(destination_dir: str) -> None:
+     banner(f"Fetching pre-built wheels for {CONSTANTS.pants_unstable_version}")
+     print(f"Saving to {destination_dir}.\n", file=sys.stderr)
++    session = requests.Session()
++    session.mount(CONSTANTS.binary_base_url, requests.adapters.HTTPAdapter(max_retries=4))
+     for wheel in determine_prebuilt_wheels():
+         full_url = f"{CONSTANTS.binary_base_url}/{wheel.url}"
+         print(f"Fetching {full_url}", file=sys.stderr)
+-        response = requests.get(full_url)
++        response = session.get(full_url)
+         response.raise_for_status()
+         print(file=sys.stderr)
+[2026-01-26 23:40:30] 
+ACTUAL MESSAGE: Make fetching wheels more resilient to network errors. (#)
+[2026-01-26 23:40:30] GENERATED MESSAGE: Add session mount to prebuilt wheel (#)
+[2026-01-26 23:40:30] ==================================================
+
+[2026-01-26 23:40:35] Checkpoint saved at step 56000
+[2026-01-26 23:43:43] 
+==================================================
+[2026-01-26 23:43:43] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:43:43] DIFF:
+FILE: tests/TestCase/ORM/TableUuidTest.php
+@@ -94,6 +94,7 @@ class TableUuidTest extends TestCase {
+ 		$this->assertEquals($id, $entity->id, 'Should be 36 characters');
+ 		$row = $table->find('all')->where(['id' => $entity->id])->first();
++		$row->id = strtolower($row->id);
+ 		$this->assertEquals($entity->toArray(), $row->toArray());
+ 	}
+[2026-01-26 23:43:43] 
+ACTUAL MESSAGE: SQL Server normalizes uuids to uppercase, fixing test accordingly
+[2026-01-26 23:43:43] GENERATED MESSAGE: Added test for table uuid id
+[2026-01-26 23:43:43] ==================================================
+
+[2026-01-26 23:43:47] Checkpoint saved at step 56500
+[2026-01-26 23:46:58] 
+==================================================
+[2026-01-26 23:46:58] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:46:58] DIFF:
+FILE: test/index.spec.js
+@@ -85,6 +85,20 @@ describe('immutableStateInvariantMiddleware', () => {
+     }).toNotThrow();
+   });
++  it('respects "isImmutable" option', function () {
++    const isImmutable = (value) => true
++    const next = action => {
++      state.foo.bar.push(5);
++      return action;
++    };
++
++    const dispatch = middleware({ isImmutable })(next);
++
++    expect(() => {
++      dispatch({type: 'SOME_ACTION'});
++    }).toNotThrow();
++  })
++
+   it('respects "ignore" option', () => {
+     const next = action => {
+       state.foo.bar.push(5);
+[2026-01-26 23:46:58] 
+ACTUAL MESSAGE: add test for isImmutable option, branch coverage to %
+[2026-01-26 23:46:58] GENERATED MESSAGE: Add test for is Immutable (#)
+[2026-01-26 23:46:58] ==================================================
+
+[2026-01-26 23:47:03] Checkpoint saved at step 57000
+[2026-01-26 23:50:10] 
+==================================================
+[2026-01-26 23:50:10] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:50:10] DIFF:
+FILE: examples/multi_script_CLI.py
+@@ -5,7 +5,7 @@ import os
+ import getpass
+ from tqdm import tqdm
+-sys.path.append(os.path.join(sys.path[0], '../../'))
++sys.path.append(os.path.join(sys.path[0], '../'))
+ from instabot import Bot
+ # initial
+@@ -280,11 +280,11 @@ def menu_follow():
+         if ans == "1":
+             print("""
+-            1.insert username
+-            2.use username database
++            1.insert hashtag
++            2.use hashtag database
+             """)
+             if "1" in sys.stdin.readline():
+-                user_id = input("who?").strip()
++                user_id = input("what?").strip()
+             else:
+                 user_id = random.choice(bot.read_list_from_file(users_file))
+             nlikes = input('how much like per account?')
+[2026-01-26 23:50:10] 
+ACTUAL MESSAGE: Fixed sys.path and some typos
+[2026-01-26 23:50:10] GENERATED MESSAGE: Fix multi script cli example (#)
+[2026-01-26 23:50:10] ==================================================
+
+[2026-01-26 23:50:15] Checkpoint saved at step 57500
+[2026-01-26 23:53:21] 
+==================================================
+[2026-01-26 23:53:21] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:53:21] DIFF:
+FILE: lib/context.js
+@@ -159,8 +159,11 @@ Context.prototype = {
+ 			arr = this.data;
+ 		else
+ 			arr = utils.getProp(this.data, path);
+-		if (!arr)
+-			throw new Error("yamvish.Context : Missing array at " + path.join(".") + " : couldn't push object.");
++		if (!arr) {
++			arr = [];
++			utils.setProp(this.data, path, arr);
++			// throw new Error("yamvish.Context : Missing array at " + path.join(".") + " : couldn't push object.");
++		}
+ 		if (!arr.forEach) {
+ 			console.error(path, 'is not array at context.push : ', arr);
+ 			throw new Error("yamvish.Context : Object is not array at " + path.join(".") + " : couldn't push object.");
+[2026-01-26 23:53:21] 
+ACTUAL MESSAGE: add auto creation of array on push when not defined
+[2026-01-26 23:53:21] GENERATED MESSAGE: don't throw an error when trying to push an object
+[2026-01-26 23:53:21] ==================================================
+
+[2026-01-26 23:53:25] Checkpoint saved at step 58000
+[2026-01-26 23:56:32] 
+==================================================
+[2026-01-26 23:56:32] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:56:32] DIFF:
+FILE: textx/commands/console.py
+@@ -27,6 +27,8 @@ def textx():
+     parser.add_argument('model', help='Model file name', nargs='?')
+     parser.add_argument('-i', help='case-insensitive parsing',
+                         action='store_true')
++    parser.add_argument('-d', help='run in debug mode',
++                        action='store_true')
+     args = parser.parse_args()
+@@ -36,7 +38,8 @@ def textx():
+         sys.exit(1)
+     try:
+-        metamodel = metamodel_from_file(args.metamodel, ignore_case=args.ci)
++        metamodel = metamodel_from_file(args.metamodel, ignore_case=args.i,
++                                        debug=args.d)
+         print("Meta-model OK.")
+     except TextXError as e:
+         print("Error in meta-model file.")
+@@ -45,7 +48,7 @@ def textx():
+     if args.model:
+         try:
+-            model = metamodel.model_from_file(args.model)
++            model = metamodel.model_from_file(args.model, debug=args.d)
+             print("Model OK.")
+         except TextXError as e:
+             print("Error in model file.")
+[2026-01-26 23:56:32] 
+ACTUAL MESSAGE: Added debug switch to textx command.
+[2026-01-26 23:56:32] GENERATED MESSAGE: 
+[2026-01-26 23:56:32] ==================================================
+
+[2026-01-26 23:56:37] Checkpoint saved at step 58500
+[2026-01-26 23:59:46] 
+==================================================
+[2026-01-26 23:59:46] TEST ON RANDOM VAL DIFF:
+[2026-01-26 23:59:46] DIFF:
+FILE: lib/smartsheet/constants.rb
+@@ -9,6 +9,8 @@ module Smartsheet
+     EXCEL_TYPE = 'application/vnd.ms-excel'.freeze
+     PDF_TYPE = 'application/pdf'.freeze
+     CSV_TYPE = 'text/csv'.freeze
++    OPENXML_SPREADSHEET_TYPE =
++      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'.freeze
+     DEFAULT_MAX_RETRY_TIME = 15
+     DEFAULT_BACKOFF_METHOD = proc { |iteration, _result| 2**iteration + rand }
+[2026-01-26 23:59:46] 
+ACTUAL MESSAGE: Add a constant for OpenXML spreadsheet MIME types.
+[2026-01-26 23:59:46] GENERATED MESSAGE: Add openxml formats file type to constants
+[2026-01-26 23:59:46] ==================================================
+
+[2026-01-26 23:59:51] Checkpoint saved at step 59000
+[2026-01-27 00:02:57] 
+==================================================
+[2026-01-27 00:02:57] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:02:57] DIFF:
+FILE: lib/reporter.js
+@@ -1,5 +1,4 @@
+ const chalk = require("chalk");
+-const path = require("path");
+ const unpad = require("./unpad");
+ module.exports = class Reporter {
+@@ -40,13 +39,6 @@ module.exports = class Reporter {
+     }
+   }
+-  getPath(id) {
+-    if (id.charAt(0) !== "/") {
+-      return path.resolve(process.cwd(), id);
+-    }
+-    return path.relative(process.cwd(), id);
+-  }
+-
+   getLocation(node) {
+     const { loc: { start, end } } = node;
+     return `${start.line}:${end.line}`;
+[2026-01-27 00:02:57] 
+ACTUAL MESSAGE: remove unsed fn in repoter
+[2026-01-27 00:02:57] GENERATED MESSAGE: removed unnecessary `getPath`
+[2026-01-27 00:02:57] ==================================================
+
+[2026-01-27 00:03:02] Checkpoint saved at step 59500
+[2026-01-27 00:06:10] 
+==================================================
+[2026-01-27 00:06:10] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:06:10] DIFF:
+FILE: py3status/modules/window.py
+@@ -97,12 +97,12 @@ class I3ipc(Ipc):
+                     and len(focused.parent.nodes) > 1
+                 )
+             ):
+-                focused.window_title = None
++                focused.name = None
+         self.update(focused)
+     def update(self, window_properties):
+         window_properties = {
+-            "title": window_properties.window_title,
++            "title": window_properties.name,
+             "class": window_properties.window_class,
+             "instance": window_properties.window_instance,
+         }
+@@ -157,7 +157,7 @@ class Msg(Ipc):
+                 if res:
+                     return res
+         elif isinstance(tree, dict):
+-            nodes = tree["nodes"] + tree["floating_nodes"]
++            nodes = tree.get("nodes", []) + tree.get("floating_nodes", [])
+             if focused:
+                 for node in nodes:
+                     if node["id"] == focused["id"]:
+[2026-01-27 00:06:10] 
+ACTUAL MESSAGE: window: get name instead of window_title, get nodes or empty lists (#)
+[2026-01-27 00:06:10] GENERATED MESSAGE: 
+[2026-01-27 00:06:10] ==================================================
+
+[2026-01-27 00:06:14] Checkpoint saved at step 60000
+[2026-01-27 00:09:23] 
+==================================================
+[2026-01-27 00:09:23] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:09:23] DIFF:
+FILE: src/main/org/codehaus/groovy/control/CompilerConfiguration.java
+@@ -227,7 +227,7 @@ public class CompilerConfiguration {
+         setDefaultScriptExtension(safeGetSystemProperty("groovy.default.scriptExtension", ".groovy"));
+         // Source file encoding
+-        String encoding = safeGetSystemProperty("file.encoding", "US-ASCII");
++        String encoding = safeGetSystemProperty("file.encoding", "UTF-8");
+         encoding = safeGetSystemProperty("groovy.source.encoding", encoding);
+         setSourceEncoding(encoding);
+[2026-01-27 00:09:23] 
+ACTUAL MESSAGE: Change the default encoding of source file to UTF-8
+[2026-01-27 00:09:23] GENERATED MESSAGE: Update Groovy compiler configuration
+Fixes issue #.
+This commit consists of patches automatically generated by <URL>
+[2026-01-27 00:09:23] ==================================================
+
+[2026-01-27 00:09:27] Checkpoint saved at step 60500
+[2026-01-27 00:12:39] 
+==================================================
+[2026-01-27 00:12:39] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:12:39] DIFF:
+FILE: src/Database/DatabaseServiceProvider.php
+@@ -36,12 +36,12 @@ class DatabaseServiceProvider extends ServiceProvider
+             return $resolver;
+         });
+-    }
+-    public function boot()
+-    {
+         if (Core::isInstalled()) {
+-            Model::setConnectionResolver($this->app->make('Illuminate\Database\ConnectionResolverInterface'));
++            $this->app->booting(function() {
++                $resolver = $this->app->make('Illuminate\Database\ConnectionResolverInterface');
++                Model::setConnectionResolver($resolver);
++            });
+         }
+     }
+ }
+[2026-01-27 00:12:39] 
+ACTUAL MESSAGE: Set model's connection resolver as soon as possible.
+[2026-01-27 00:12:39] GENERATED MESSAGE: Booting the connection resolver before booting
+[2026-01-27 00:12:39] ==================================================
+
+[2026-01-27 00:12:43] Checkpoint saved at step 61000
+[2026-01-27 00:15:49] 
+==================================================
+[2026-01-27 00:15:49] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:15:49] DIFF:
+FILE: js/southxchange.js
+@@ -177,10 +177,7 @@ module.exports = class southxchange extends Exchange {
+     }
+     parseTrade (trade, market) {
+-        let timestamp = this.safeInteger (trade, 'At');
+-        if (timestamp !== undefined) {
+-            timestamp = timestamp * 1000;
+-        }
++        const timestamp = this.safeTimestamp (trade, 'At');
+         const price = this.safeFloat (trade, 'Price');
+         const amount = this.safeFloat (trade, 'Amount');
+         let cost = undefined;
+[2026-01-27 00:15:49] 
+ACTUAL MESSAGE: southxchange safeTimestamp
+[2026-01-27 00:15:49] GENERATED MESSAGE: fix(SouthxChange): fix typo (#)
+[2026-01-27 00:15:49] ==================================================
+
+[2026-01-27 00:15:54] Checkpoint saved at step 61500
+[2026-01-27 00:19:04] 
+==================================================
+[2026-01-27 00:19:04] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:19:04] DIFF:
+FILE: src/http/api/routes/pubsub.js
+@@ -6,7 +6,12 @@ module.exports = [
+   {
+     method: '*',
+     path: '/api/v0/pubsub/sub',
+-    handler: resources.pubsub.subscribe.handler
++    handler: resources.pubsub.subscribe.handler,
++    options: {
++      timeout: {
++        socket: false
++      }
++    }
+   },
+   {
+     method: '*',
+[2026-01-27 00:19:04] 
+ACTUAL MESSAGE: fix: disable socket timeout for pubsub subscriptions (#)
+By default, node sockets automatically timeout after 2 minutes. This instructs Hapi to disable the timeout.
+License: MIT
+[2026-01-27 00:19:04] GENERATED MESSAGE: Add timeout option to PubSub routes (#)
+[2026-01-27 00:19:04] ==================================================
+
+[2026-01-27 00:19:08] Checkpoint saved at step 62000
+[2026-01-27 00:22:16] 
+==================================================
+[2026-01-27 00:22:16] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:22:16] DIFF:
+FILE: plugins/ml/src/main/java/org/mwg/ml/common/matrix/operation/PInvSVD.java
+@@ -52,7 +52,7 @@ public class PInvSVD {
+             if( S.get(i,i) > maxSingular )
+                 maxSingular = S.get(i,i);
+         }
+-        double tau = Math.pow(2,-40)*Math.max(A.columns(),A.rows())*maxSingular;
++        double tau = Math.pow(2,-50)*Math.max(A.columns(),A.rows())*maxSingular;
+         rank=0;
+         det=1;
+[2026-01-27 00:22:16] 
+ACTUAL MESSAGE: Improve precision to avoid underflow in multivariate distributions
+[2026-01-27 00:22:16] GENERATED MESSAGE: [ml] Correctly calculate the number of columns in the matrix.
+[2026-01-27 00:22:16] ==================================================
+
+[2026-01-27 00:22:21] Checkpoint saved at step 62500
+[2026-01-27 00:25:29] 
+==================================================
+[2026-01-27 00:25:29] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:25:29] DIFF:
+FILE: lib/Condorcet.php
+@@ -15,7 +15,7 @@ use Condorcet\Election;
+ require_once __DIR__ . DIRECTORY_SEPARATOR . '__CondorcetAutoload.php';
+ require_once __DIR__ . DIRECTORY_SEPARATOR . '__CondorcetConfig.php';
+-class Condorcet
++abstract class Condorcet
+ {
+ /////////// CONSTANTS ///////////
+[2026-01-27 00:25:29] 
+ACTUAL MESSAGE: Condorcet is now an abstract class.
+[2026-01-27 00:25:29] GENERATED MESSAGE: [BUGFIX] Fix wrong class name.
+Fixes #
+[2026-01-27 00:25:29] ==================================================
+
+[2026-01-27 00:25:34] Checkpoint saved at step 63000
+[2026-01-27 00:28:45] 
+==================================================
+[2026-01-27 00:28:45] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:28:45] DIFF:
+FILE: converters/fromZigbee.js
+@@ -3272,7 +3272,7 @@ const converters = {
+             case tuya.dataPoints.moesScheduleEnable: // state is inverted, preset_mode is deprecated
+                 return {preset_mode: value ? 'hold' : 'program', preset: value ? 'hold' : 'program'};
+             case tuya.dataPoints.moesValve:
+-                return {heat: value ? 'OFF' : 'ON'};
++                return {heat: value ? 'OFF' : 'ON', running_state: (value ? 'idle' : (model.model === 'BAC-002-ALZB' ? 'cool' : 'heat'))};
+             case tuya.dataPoints.moesSensor:
+                 switch (value) {
+                 case 0:
+[2026-01-27 00:28:45] 
+ACTUAL MESSAGE: Fix `running_state` missing for BAC--ALZB (#)
+[2026-01-27 00:28:45] GENERATED MESSAGE: Use running state to determine whether or not to use a preset.
+[2026-01-27 00:28:45] ==================================================
+
+[2026-01-27 00:28:49] Checkpoint saved at step 63500
+[2026-01-27 00:31:56] 
+==================================================
+[2026-01-27 00:31:56] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:31:56] DIFF:
+FILE: lib/arena.rb
+@@ -4,4 +4,8 @@ class Arena
+   def initialize(args)
+     @robot_runners = args.fetch(:robot_runners)
+   end
++
++  def update
++    robot_runners.each(&:update)
++  end
+ end
+FILE: spec/arena_spec.rb
+@@ -5,6 +5,17 @@ describe Arena do
+     it { expect(arena).to respond_to(:robot_runners) }
+   end
++  describe '#update' do
++    it 'notifies all robot runners' do
++      robot_runner = double('robot_runner')
++
++      expect(robot_runner).to receive(:update)
++
++      arena = Arena.new(robot_runners: [robot_runner])
++      arena.update
++    end
++  end
++
+   def arena
+     @_arena ||= Arena.new(robot_runners: [])
+   end
+[2026-01-27 00:31:56] 
+ACTUAL MESSAGE: Add robot_runners to arena (and update method)
+[2026-01-27 00:31:56] GENERATED MESSAGE: added update method toArena
+[2026-01-27 00:31:56] ==================================================
+
+[2026-01-27 00:32:01] Checkpoint saved at step 64000
+[2026-01-27 00:35:09] 
+==================================================
+[2026-01-27 00:35:10] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:35:10] DIFF:
+FILE: src/phone_field.php
+@@ -1,4 +1,7 @@
+ <?php
++defined("PHONE_FIELD_DEFAULT_COUNTRY_CODE") || define("PHONE_FIELD_DEFAULT_COUNTRY_CODE","+420");
++defined("PHONE_FIELD_SAMPLE_PHONE_NUMBER") || define("PHONE_FIELD_SAMPLE_PHONE_NUMBER","+420 605 123 456");
++
+ class PhoneField extends RegexField{
+ 	function __construct($options = array()){
+@@ -6,8 +9,8 @@ class PhoneField extends RegexField{
+ 			"error_messages" => array(),
+ 			"help_text" => _("Enter phone number in format %sample_phone_number%"),
+ 			"null_empty_output" => true,
+-			"default_country_code" => "+420", // "420" or "+420"
+-			"sample_phone_number" => "+420 605 123 456",
++			"default_country_code" => PHONE_FIELD_DEFAULT_COUNTRY_CODE, // "421" or "+420"
++			"sample_phone_number" => PHONE_FIELD_SAMPLE_PHONE_NUMBER,
+ 		);
+ 		$options += array(
+[2026-01-27 00:35:10] 
+ACTUAL MESSAGE: Defined constant PHONE_FIELD_DEFAULT_COUNTRY_CODE and PHONE_FIELD_SAMPLE_PHONE_NUMBER
+[2026-01-27 00:35:10] GENERATED MESSAGE: Added default country code to phone field
+[2026-01-27 00:35:10] ==================================================
+
+[2026-01-27 00:35:14] Checkpoint saved at step 64500
+[2026-01-27 00:38:21] 
+==================================================
+[2026-01-27 00:38:21] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:38:21] DIFF:
+FILE: src/featherlight.js
+@@ -205,14 +205,14 @@
+ 			self.$instance.removeClass(self.namespace+'-loading');
+-			self.$content = $content.addClass(self.namespace+'-inner');
+-
+ 			/* replace content by appending to existing one before it is removed
+ 			   this insures that featherlight-inner remain at the same relative
+ 				 position to any other items added to featherlight-content */
+ 			self.$instance.find('.'+self.namespace+'-inner')
+ 				.slice(1).remove().end()			/* In the unexpected event where there are many inner elements, remove all but the first one */
+-				.replaceWith(self.$content);
++				.replaceWith($content);
++
++			self.$content = $content.addClass(self.namespace+'-inner');
+ 			return self;
+ 		},
+[2026-01-27 00:38:21] 
+ACTUAL MESSAGE: Move code around so things don't break down if the content
+is already inserted in the lightbox
+[2026-01-27 00:38:21] GENERATED MESSAGE: [FEAT-] Fixing issue #.
+[2026-01-27 00:38:21] ==================================================
+
+[2026-01-27 00:38:26] Checkpoint saved at step 65000
+[2026-01-27 00:41:31] 
+==================================================
+[2026-01-27 00:41:31] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:41:31] DIFF:
+FILE: test/test-creation.js
+@@ -119,7 +119,7 @@ var expectedFiles = {
+         'bower.json',
+         'package.json',
+         '.bowerrc',
+-        'src/main/webapp/content/styles/main.css',
++        'src/main/webapp/content/css/main.css',
+         'src/main/webapp/favicon.ico',
+         'src/main/webapp/robots.txt',
+         'src/main/webapp/.htaccess',
+@@ -251,7 +251,7 @@ var expectedFiles = {
+         'src/test/javascript/spec/app/account/reset/finish/reset.finish.controller.spec.js',
+         'src/test/javascript/spec/app/account/reset/request/reset.request.controller.spec.js',
+         'src/test/javascript/spec/components/auth/auth.services.spec.js',
+-        'src/main/webapp/content/styles/documentation.css',
++        'src/main/webapp/content/css/documentation.css',
+         'src/main/webapp/content/images/development_ribbon.png',
+         'src/main/webapp/content/images/hipster.png',
+         'src/main/webapp/content/images/hipster2x.png'
+[2026-01-27 00:41:31] 
+ACTUAL MESSAGE: rename style to css in test
+[2026-01-27 00:41:31] GENERATED MESSAGE: fix(tests): add missing files in tests (#)
+[2026-01-27 00:41:31] ==================================================
+
+[2026-01-27 00:41:36] Checkpoint saved at step 65500
+[2026-01-27 00:44:45] 
+==================================================
+[2026-01-27 00:44:45] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:44:45] DIFF:
+FILE: cypress.config.js
+@@ -6,5 +6,6 @@ module.exports = defineConfig({
+         supportFile: false,
+         specPattern: "**/*.spec.js",
+         retries: 2,
++        videoUploadOnPasses: false
+     }
+ })
+FILE: cypress/integration/default/search.inc.js
+@@ -61,7 +61,8 @@ export default function() {
+             .type('pizza')
+             .blur(); // Ensure focus is gone
+-        cy.get('.phpdocumentor-search--has-results')
++        cy.get('.phpdocumentor-search-results__dialog')
++            .parents('body')
+             .type('{esc}');
+         cy.get('.phpdocumentor-header .phpdocumentor-search')
+[2026-01-27 00:44:45] 
+ACTUAL MESSAGE: Fix broken "escape" test and only record video on failures
+[2026-01-27 00:44:45] GENERATED MESSAGE: fix(search): add missing parents to search results
+[2026-01-27 00:44:45] ==================================================
+
+[2026-01-27 00:44:49] Checkpoint saved at step 66000
+[2026-01-27 00:47:56] 
+==================================================
+[2026-01-27 00:47:56] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:47:56] DIFF:
+FILE: src/exceptions.php
+@@ -35,7 +35,7 @@ class HTTPStatus extends \Exception
+ /**
+  * Redirect (probably the most used exception).
+  */
+-class HttpRedirect extends HTTPStatus
++class HTTPRedirect extends HTTPStatus
+ {
+     /** The URL to redirect to. */
+     protected $url;
+[2026-01-27 00:47:56] 
+ACTUAL MESSAGE: Fixed accidentally renamed HTTPRedirect.
+[2026-01-27 00:47:56] GENERATED MESSAGE: Added missing class name to httpredirect
+[2026-01-27 00:47:56] ==================================================
+
+[2026-01-27 00:48:00] Checkpoint saved at step 66500
+[2026-01-27 00:51:07] 
+==================================================
+[2026-01-27 00:51:07] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:51:07] DIFF:
+FILE: presto-raptor/src/test/java/com/facebook/presto/raptor/backup/TestFileBackupStore.java
+@@ -26,6 +26,7 @@ import static com.google.common.io.RecursiveDeleteOption.ALLOW_INSECURE;
+ import static java.lang.String.format;
+ import static org.testng.Assert.assertEquals;
++@Test(singleThreaded = true)
+ public class TestFileBackupStore
+         extends AbstractTestBackupStore<FileBackupStore>
+ {
+[2026-01-27 00:51:07] 
+ACTUAL MESSAGE: Make TestFileBackupStore single threaded
+Make TestFileBackupStore single threaded to prevent long running test
+duration.
+[2026-01-27 00:51:07] GENERATED MESSAGE: Test file backup store should be single threaded
+[2026-01-27 00:51:07] ==================================================
+
+[2026-01-27 00:51:11] Checkpoint saved at step 67000
+[2026-01-27 00:54:21] 
+==================================================
+[2026-01-27 00:54:21] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:54:21] DIFF:
+FILE: lib/index.js
+@@ -21,9 +21,9 @@ on = function (type, listener) {
+ };
+ once = function (type, listener) {
+-	var off = off.bind(this);
++	var offt = off.bind(this);
+ 	return on.call(this, type, function self () {
+-		off(type, self);
++		offt(type, self);
+ 		listener.apply(this, arguments);
+ 	});
+ };
+[2026-01-27 00:54:21] 
+ACTUAL MESSAGE: Functions shouldn't depend on its property names on object
+[2026-01-27 00:54:21] GENERATED MESSAGE: refactor(index): use bind instead of on
+[2026-01-27 00:54:21] ==================================================
+
+[2026-01-27 00:54:25] Checkpoint saved at step 67500
+[2026-01-27 00:57:33] 
+==================================================
+[2026-01-27 00:57:33] TEST ON RANDOM VAL DIFF:
+[2026-01-27 00:57:33] DIFF:
+FILE: spead2/recv/__init__.py
+@@ -144,7 +144,8 @@ class Item(Descriptor):
+             if elements > max_elements:
+                 raise TypeError('Item has too few elements for shape (%d < %d)' % (max_elements, elements))
+             # For some reason, np.frombuffer doesn't work on memoryview, but np.array does
+-            array1d = np.array(raw_item.value, copy=False).view(dtype=self.dtype)[:elements]
++            array1d = np.array(raw_item.value, copy=False)[: (elements * self.dtype.itemsize)]
++            array1d = array1d.view(dtype=self.dtype)
+             if self.dtype.byteorder in ('<', '>'):
+                 # Either < or > indicates non-native endianness. Swap it now
+                 # so that calculations later will be efficient
+[2026-01-27 00:57:33] 
+ACTUAL MESSAGE: Fix crash when item payload not an even multiple of the item size
+[2026-01-27 00:57:33] GENERATED MESSAGE: Fix bug with np frombuffer (#)
+[2026-01-27 00:57:33] ==================================================
+
+[2026-01-27 00:57:37] Checkpoint saved at step 68000
+[2026-01-27 01:00:49] 
+==================================================
+[2026-01-27 01:00:49] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:00:49] DIFF:
+FILE: src/Html/Builder.php
+@@ -161,7 +161,7 @@ class Builder
+      */
+     protected function isCallbackFunction($value, $key)
+     {
+-        return Str::startsWith(trim($value), config('datatables-html.callback', ['$', '$.', 'function'])) || Str::contains($key, 'editor');
++        return Str::startsWith(trim($value), $this->config->get('datatables-html.callback', ['$', '$.', 'function'])) || Str::contains($key, 'editor');
+     }
+     /**
+[2026-01-27 01:00:49] 
+ACTUAL MESSAGE: Correcting config call in isCallbackFunction
+[2026-01-27 01:00:49] GENERATED MESSAGE: Fixing a bug in the callback function.
+[2026-01-27 01:00:49] ==================================================
+
+[2026-01-27 01:00:54] Checkpoint saved at step 68500
+[2026-01-27 01:04:01] 
+==================================================
+[2026-01-27 01:04:01] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:04:01] DIFF:
+FILE: lib/optimize/ConcatenatedModule.js
+@@ -602,7 +602,7 @@ class ConcatenatedModule extends Module {
+ 			name = "";
+ 		// Remove uncool stuff
+-		extraInfo = extraInfo.replace(/\.+\/|(\/index)?\.([a-zA-Z0-9]{1,4})$/g, "");
++		extraInfo = extraInfo.replace(/\.+\/|(\/index)?\.([a-zA-Z0-9]{1,4})($|\s|\?)|\s*\+\s*\d+\s*modules/g, "");
+ 		const splittedInfo = extraInfo.split("/");
+ 		while(splittedInfo.length) {
+[2026-01-27 01:04:01] 
+ACTUAL MESSAGE: generate more pretty names for nested concatenation
+[2026-01-27 01:04:01] GENERATED MESSAGE: [fix] Remove extra info from concatenated modules (#)
+[2026-01-27 01:04:01] ==================================================
+
+[2026-01-27 01:04:06] Checkpoint saved at step 69000
+[2026-01-27 01:14:05] Summary Epoch 3: Train Loss: 1.0983| Train Accuracy: 0.5677        | Val Loss: 1.4088| Val Accuracy: 0.7244)| PPL: 4.0909
+[2026-01-27 01:14:07] >>> New best model saved!
+[2026-01-27 01:16:25] 
+==================================================
+[2026-01-27 01:16:25] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:16:25] DIFF:
+FILE: config/routes.rb
+@@ -202,7 +202,8 @@ Src::Application.routes.draw do
+   namespace :api do
+     match '/' => 'root#resource_list'
+-    resources :systems, :only => [:show, :destroy]
++    resources :systems, :only => [:show, :destroy, :create, :index]
++
+     resources :providers do
+       resources :sync, :only => [:index, :show, :create] do
+         delete :index, :on => :collection, :action => :cancel
+@@ -236,7 +237,6 @@ Src::Application.routes.draw do
+           get :repositories
+         end
+       end
+-      resources :systems, :only => [:create, :index]
+       resources :tasks, :only => [:index]
+       member do
+         get :providers
+[2026-01-27 01:16:25] 
+ACTUAL MESSAGE: merging systems resource in the routes into one
+[2026-01-27 01:16:25] GENERATED MESSAGE: Use create instead of create in routes.
+[2026-01-27 01:16:25] ==================================================
+
+[2026-01-27 01:16:30] Checkpoint saved at step 69500
+[2026-01-27 01:19:39] 
+==================================================
+[2026-01-27 01:19:39] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:19:39] DIFF:
+FILE: integration-cli/docker_cli_rmi_test.go
+@@ -102,7 +102,12 @@ func TestRmiTagWithExistingContainers(t *testing.T) {
+ func TestRmiForceWithExistingContainers(t *testing.T) {
+ 	image := "busybox-clone"
+-	if out, _, err := runCommandWithOutput(exec.Command(dockerBinary, "build", "--no-cache", "-t", image, "/docker-busybox")); err != nil {
++
++	cmd := exec.Command(dockerBinary, "build", "--no-cache", "-t", image, "-")
++	cmd.Stdin = strings.NewReader(`FROM busybox
++MAINTAINER foo`)
++
++	if out, _, err := runCommandWithOutput(cmd); err != nil {
+ 		t.Fatalf("Could not build %s: %s, %v", image, out, err)
+ 	}
+[2026-01-27 01:19:39] 
+ACTUAL MESSAGE: integration-cli: fix test to use busybox outside container
+Fixes TestRmiForceWithExistingContainers test to make it use
+`busybox` image rather than /docker-busybox hardcoded path
+and rebuilding image.
+[2026-01-27 01:19:39] GENERATED MESSAGE: test: run rmi force with existing containers (#)
+[2026-01-27 01:19:39] ==================================================
+
+[2026-01-27 01:19:44] Checkpoint saved at step 70000
+[2026-01-27 01:22:50] 
+==================================================
+[2026-01-27 01:22:50] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:22:50] DIFF:
+FILE: spec/doublespeak_spec_helper.rb
+@@ -10,5 +10,9 @@ RSpec.configure do |config|
+     c.syntax = :expect
+   end
++  if config.files_to_run.one?
++    config.default_formatter = 'doc'
++  end
++
+   config.mock_with :rspec
+ end
+[2026-01-27 01:22:50] 
+ACTUAL MESSAGE: Use doc formatter when running Doublespeak tests
+[2026-01-27 01:22:50] GENERATED MESSAGE: Add spec for default formatter
+[2026-01-27 01:22:50] ==================================================
+
+[2026-01-27 01:22:54] Checkpoint saved at step 70500
+[2026-01-27 01:26:04] 
+==================================================
+[2026-01-27 01:26:04] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:26:04] DIFF:
+FILE: src/Keboola/Syrup/Command/JobCleanupCommand.php
+@@ -113,8 +113,15 @@ class JobCleanupCommand extends ContainerAwareCommand
+         // run cleanup
+         $jobExecutor->cleanup();
+-        // Update job status to 'terminated'
++        // Update job
++        $endTime = time();
++        $duration = $endTime - strtotime($this->job->getStartTime());
+         $this->job->setStatus(Job::STATUS_TERMINATED);
++        $this->job->setResult([
++            'message' => 'Job has been terminated'
++        ]);
++        $this->job->setEndTime(date('c', $endTime));
++        $this->job->setDurationSeconds($duration);
+         $this->jobMapper->update($this->job);
+         // run post-cleanup
+[2026-01-27 01:26:04] 
+ACTUAL MESSAGE: fix: update job properties before postCleanup
+[2026-01-27 01:26:04] GENERATED MESSAGE: Update JobStatus to Terminated before running job cleanup
+[2026-01-27 01:26:04] ==================================================
+
+[2026-01-27 01:26:09] Checkpoint saved at step 71000
+[2026-01-27 01:29:17] 
+==================================================
+[2026-01-27 01:29:17] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:29:17] DIFF:
+FILE: lib/logidze/model.rb
+@@ -25,7 +25,7 @@ module Logidze
+         attribute :log_data, Logidze::History::Type.new
+       end
+-      delegate :version, :size, to: :log_data, prefix: "log"
++      delegate :version, to: :log_data, prefix: "log"
+     end
+     module ClassMethods # :nodoc:
+@@ -195,6 +195,10 @@ module Logidze
+     end
+     # rubocop: enable Metrics/MethodLength
++    def log_size
++      log_data&.size || 0
++    end
++
+     protected
+     def apply_diff(version, diff)
+FILE: spec/logidze/model_spec.rb
+@@ -557,4 +557,18 @@ describe Logidze::Model, :db do
+       end
+     end
+   end
++
++  describe '#log_size' do
++    subject { user.log_size }
++
++    it { is_expected.to eq(user.log_data.size) }
++
++    context 'when model created within a without_logging block' do
++      let(:user) { User.create!(name: 'test') }
++
++      before { Logidze.without_logging { user } }
++
++      it { is_expected.to be_zero }
++    end
++  end
+ end
+[2026-01-27 01:29:17] 
+ACTUAL MESSAGE: Return 0 for log size when log_data is nil (#)
+[2026-01-27 01:29:17] GENERATED MESSAGE: Add a method to log the size of a model
+[2026-01-27 01:29:17] ==================================================
+
+[2026-01-27 01:29:22] Checkpoint saved at step 71500
+[2026-01-27 01:32:30] 
+==================================================
+[2026-01-27 01:32:30] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:32:30] DIFF:
+FILE: chess/__init__.py
+@@ -1866,12 +1866,11 @@ class Board(BaseBoard):
+         # The next legal move is a threefold repetition.
+         for move in self.generate_legal_moves():
+             self.push(move)
+-
+-            if transpositions[self._transposition_key()] >= 2:
++            try:
++                if transpositions[self._transposition_key()] >= 2:
++                    return True
++            finally:
+                 self.pop()
+-                return True
+-
+-            self.pop()
+         return False
+[2026-01-27 01:32:30] 
+ACTUAL MESSAGE: Simplify final pop in can_claim_threefold_repetition
+[2026-01-27 01:32:30] GENERATED MESSAGE: Don't try to pop the board if it doesn't exist.
+[2026-01-27 01:32:30] ==================================================
+
+[2026-01-27 01:32:34] Checkpoint saved at step 72000
+[2026-01-27 01:35:43] 
+==================================================
+[2026-01-27 01:35:43] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:35:43] DIFF:
+FILE: setup.py
+@@ -54,7 +54,7 @@ setup(
+     install_requires=[
+         'tweepy >=3.5.0, <4',
+-        'PyYAML==3.11',
++        'pyyaml>=4.2b1',
+     ],
+     test_suite="tests",
+FILE: twitter_bot_utils/confighelper.py
+@@ -86,7 +86,7 @@ def parse(file_path):
+     _, ext = path.splitext(file_path)
+     if ext in ('.yaml', '.yml'):
+-        func = yaml.load
++        func = yaml.safe_load
+     elif ext == '.json':
+         func = json.load
+[2026-01-27 01:35:43] 
+ACTUAL MESSAGE: switch to yaml safe_load
+[2026-01-27 01:35:43] GENERATED MESSAGE: Update Twitter bot utils to be compatible with Python
+[2026-01-27 01:35:43] ==================================================
+
+[2026-01-27 01:35:48] Checkpoint saved at step 72500
+[2026-01-27 01:38:54] 
+==================================================
+[2026-01-27 01:38:54] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:38:54] DIFF:
+FILE: packages/node_modules/ciscospark/src/config.js
+@@ -11,5 +11,8 @@ export default {
+   credentials: {
+     clientType: `confidential`
+   },
++  device: {
++    ephemeral: true
++  },
+   storage: storageConfig
+ };
+[2026-01-27 01:38:54] 
+ACTUAL MESSAGE: fix(ciscospark): make all devices ephemeral
+[2026-01-27 01:38:54] GENERATED MESSAGE: feat(node): add device to config (#)
+[2026-01-27 01:38:54] ==================================================
+
+[2026-01-27 01:38:58] Checkpoint saved at step 73000
+[2026-01-27 01:42:07] 
+==================================================
+[2026-01-27 01:42:07] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:42:07] DIFF:
+FILE: src/chart/lines/LinesView.js
+@@ -119,7 +119,7 @@ export default echarts.extendChartView({
+         // Not use motion when dragging or zooming
+         var zr = api.getZr();
+         var isSvg = zr.painter.getType() === 'svg';
+-        if (!isSvg) {
++        if (!isSvg && this._lastZlevel != null) {
+             zr.painter.getLayer(this._lastZlevel).clear(true);
+         }
+     },
+@@ -128,11 +128,7 @@ export default echarts.extendChartView({
+         this._lineDraw && this._lineDraw.remove();
+         this._lineDraw = null;
+         // Clear motion when lineDraw is removed
+-        var zr = api.getZr();
+-        var isSvg = zr.painter.getType() === 'svg';
+-        if (!isSvg) {
+-            zr.painter.getLayer(this._lastZlevel).clear(true);
+-        }
++        this._clearLayer(api);
+     },
+     dispose: function () {}
+[2026-01-27 01:42:07] 
+ACTUAL MESSAGE: [lines] Fix clearLayer.
+[2026-01-27 01:42:07] GENERATED MESSAGE: fix(lines): don't clear layer if line draw is not removed
+[2026-01-27 01:42:08] ==================================================
+
+[2026-01-27 01:42:12] Checkpoint saved at step 73500
+[2026-01-27 01:45:19] 
+==================================================
+[2026-01-27 01:45:19] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:45:19] DIFF:
+FILE: umap/umap_.py
+@@ -397,6 +397,7 @@ def create_sampler(probabilities):
+     alias = np.zeros(probabilities.shape[0], dtype=np.int64)
+     norm_prob = probabilities.shape[0] * probabilities / probabilities.sum()
++    norm_prob[np.isnan(norm_prob)] = 0.0
+     is_small = (norm_prob < 1)
+     small = np.where(is_small)[0]
+[2026-01-27 01:45:19] 
+ACTUAL MESSAGE: Handle NaNs in sampler input
+[2026-01-27 01:45:19] GENERATED MESSAGE: Fixed a bug in creating samplers.
+[2026-01-27 01:45:19] ==================================================
+
+[2026-01-27 01:45:23] Checkpoint saved at step 74000
+[2026-01-27 01:48:34] 
+==================================================
+[2026-01-27 01:48:34] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:48:34] DIFF:
+FILE: smack-core/src/main/java/org/jivesoftware/smack/AbstractXMPPConnection.java
+@@ -1097,6 +1097,7 @@ public abstract class AbstractXMPPConnection implements XMPPConnection {
+         if (packet instanceof IQ) {
+             final IQ iq = (IQ) packet;
+             if (iq.isRequestIQ()) {
++                final IQ iqRequest = iq;
+                 final String key = XmppStringUtils.generateKey(iq.getChildElementName(), iq.getChildElementNamespace());
+                 IQRequestHandler iqRequestHandler;
+                 final IQ.Type type = iq.getType();
+@@ -1162,6 +1163,11 @@ public abstract class AbstractXMPPConnection implements XMPPConnection {
+                                 // e.g. to avoid presence leaks.
+                                 return;
+                             }
++
++                            assert (response.getType() == IQ.Type.result || response.getType() == IQ.Type.error);
++
++                            response.setTo(iqRequest.getFrom());
++                            response.setStanzaId(iqRequest.getStanzaId());
+                             try {
+                                 sendStanza(response);
+                             }
+[2026-01-27 01:48:34] 
+ACTUAL MESSAGE: Ensure that IQ response 'to' address and ID are set correctly
+Fixes SMACK-.
+[2026-01-27 01:48:34] GENERATED MESSAGE: DIFF:
+FILE: smack-core/src/main/java/org/jivesoftware/smack/AbstractXMPPConnection.java
+@@ -1097,6 +1097,7 @@ public abstract class AbstractXMPPConnection implements XMPPConnection {
+         if (packet instanceof IQ) {
+             final IQ iq = (IQ) packet;
+             if (iq.isRequestIQ()) {
++                final IQ iqRequest = iq;
+                 final String key = XmppStringUtils.generateKey(iq.getChildElementName(), iq.getChildElementNamespace());
+                 IQRequestHandler iqRequestHandler;
+                 final IQ.Type type = iq.getType();
+@@ -1162,6 +1163,11 @@ public abstract class AbstractXMPPConnection implements XMPPConnection {
+                                 // e.g. to avoid presence leaks.
+                                 return;
+                             }
++
++                            assert (response.getType() == IQ.Type.result || response.getType() == IQ.Type.error);
++
++                            response.setTo(iqRequest.getFrom());
++                        } else if (!result.toString().contains("") || result.length() > 0) return response; // TODO: check if we need to return an empty response or not
+[2026-01-27 01:48:34] ==================================================
+
+[2026-01-27 01:48:38] Checkpoint saved at step 74500
+[2026-01-27 01:51:45] 
+==================================================
+[2026-01-27 01:51:45] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:51:45] DIFF:
+FILE: vsphere/internal/helper/ovfdeploy/ovf_helper.go
+@@ -78,10 +78,7 @@ func DeployOvfAndGetResult(ovfCreateImportSpecResult *types.OvfCreateImportSpecR
+ 				if totalBytes == 0 {
+ 					break
+ 				}
+-				progress = getTotalBytesRead(&currBytesRead) * 100 / totalBytes
+-				if progress == 100 {
+-					close(statusChannel)
+-				}
++				progress = (getTotalBytesRead(&currBytesRead) / totalBytes) * 100
+ 				nfcLease.Progress(context.Background(), int32(progress))
+ 				time.Sleep(10 * time.Second)
+ 			}
+[2026-01-27 01:51:45] 
+ACTUAL MESSAGE: Keep status chan open (#)
+Small OVFs result in the status chan being closed
+before 'finished' signal can be sent.
+[2026-01-27 01:51:45] GENERATED MESSAGE: fix: don't close the status channel when getting total bytes read
+[2026-01-27 01:51:45] ==================================================
+
+[2026-01-27 01:51:49] Checkpoint saved at step 75000
+[2026-01-27 01:54:59] 
+==================================================
+[2026-01-27 01:54:59] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:54:59] DIFF:
+FILE: lib/machinist.rb
+@@ -38,7 +38,7 @@ module Machinist
+       if attribute_assigned?(symbol)
+         # If we've already assigned the attribute, return that.
+         @object.send(symbol)
+-      elsif @adapter.has_association?(@object, symbol) && !@object.send(symbol).blank?
++      elsif @adapter.has_association?(@object, symbol) && !nil_or_empty?(@object.send(symbol))
+         # If the attribute is an association and is already assigned, return that.
+         @object.send(symbol)
+       else
+@@ -58,6 +58,10 @@ module Machinist
+   private
++    def nil_or_empty?(object)
++      object.respond_to?(:empty?) ? object.empty? : object.nil?
++    end
++    
+     def assign_attribute(key, value)
+       assigned_attributes[key.to_sym] = value
+       @object.send("#{key}=", value)
+[2026-01-27 01:54:59] 
+ACTUAL MESSAGE: Took out yet another unintended ActiveSupport dependency.
+[2026-01-27 01:54:59] GENERATED MESSAGE: Allow nil-or-empty attributes to be assigned.
+[2026-01-27 01:54:59] ==================================================
+
+[2026-01-27 01:55:04] Checkpoint saved at step 75500
+[2026-01-27 01:58:12] 
+==================================================
+[2026-01-27 01:58:12] TEST ON RANDOM VAL DIFF:
+[2026-01-27 01:58:12] DIFF:
+FILE: src/Devristo/Phpws/Messaging/WebSocketMessageInterface.php
+@@ -35,12 +35,6 @@ interface WebSocketMessageInterface extends MessageInterface
+     public function setData($data);
+     /**
+-     * Retrieve the body of the message
+-     * @return string
+-     */
+-    public function getData();
+-
+-    /**
+      * Create a new message
+      * @param string $data Content of the message to be created
+      */
+FILE: src/Devristo/Phpws/Protocol/WebSocketTransportInterface.php
+@@ -32,8 +32,6 @@ interface WebSocketTransportInterface extends TransportInterface
+     public function handleData($data);
+-    public function sendString($msg);
+-
+     public function getIp();
+     public function close();
+[2026-01-27 01:58:12] 
+ACTUAL MESSAGE: Removed send (WebSocketTransportInterface, already inherited from TransportInterface) and getData (WebSocketMessageInterface, already inherited from MessageInterface)
+In older PHP .* versions, there was a bug (<URL>) which threw a fatal error, if an abstract method/interface method was defined again abstract. I think this was the case prior to PHP version .
+[2026-01-27 01:58:12] GENERATED MESSAGE: removed unused method from websocket transport
+[2026-01-27 01:58:12] ==================================================
+
+[2026-01-27 01:58:17] Checkpoint saved at step 76000
+[2026-01-27 02:01:24] 
+==================================================
+[2026-01-27 02:01:24] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:01:24] DIFF:
+FILE: lib/rules/miscellaneous/comprehensive-interface.js
+@@ -43,7 +43,7 @@ class ComprehensiveInterface extends BaseChecker {
+     const isOverride = node.override !== null
+     if (isPublic && !isOverride) {
+-      this.error(node, 'All public methods have to be an override')
++      this.error(node, 'All public or external methods in a contract must override a definition from an interface')
+     }
+   }
+ }
+[2026-01-27 02:01:24] 
+ACTUAL MESSAGE: Update lib/rules/miscellaneous/comprehensive-interface.js
+[2026-01-27 02:01:24] GENERATED MESSAGE: fix(rules): fix typo (#)
+[2026-01-27 02:01:24] ==================================================
+
+[2026-01-27 02:01:28] Checkpoint saved at step 76500
+[2026-01-27 02:04:38] 
+==================================================
+[2026-01-27 02:04:38] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:04:38] DIFF:
+FILE: holoviews/plotting/plot.py
+@@ -486,7 +486,9 @@ class DimensionedPlot(Plot):
+         """
+         traverse_setter(self, '_force', True)
+         key = self.current_key if self.current_key else self.keys[0]
+-        stream_params = stream_parameters(self.streams)
++        dim_streams = [stream for stream in self.streams
++                       if any(c in self.dimensions for c in stream.contents)]
++        stream_params = stream_parameters(dim_streams)
+         key = tuple(None if d in stream_params else k
+                     for d, k in zip(self.dimensions, key))
+         stream_key = util.wrap_tuple_streams(key, self.dimensions, self.streams)
+[2026-01-27 02:04:38] 
+ACTUAL MESSAGE: Only merge dimensioned streams in plots
+[2026-01-27 02:04:38] GENERATED MESSAGE: Fixed bug in dimensioned plot.
+[2026-01-27 02:04:38] ==================================================
+
+[2026-01-27 02:04:40] Checkpoint saved at step 77000
+[2026-01-27 02:07:48] 
+==================================================
+[2026-01-27 02:07:48] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:07:48] DIFF:
+FILE: includes/functions/functions_mediadb.php
+@@ -749,16 +749,17 @@ function filterMedia2($media, $filter, $acceptExt) {
+ 	if (strpos(utf8_strtoupper($mediaobject->title), $filter)!==false)
+ 		return true;
++	// TODO: convert this to the API
+ 	//-- Accept when filter string contained in name of any item
+ 	//-- this Media item is linked to.  (Privacy already checked)
+-	foreach ($media['LINKS'] as $id=>$type) {
+-		$record=WT_GedcomRecord::getInstance($id);
+-		foreach ($record->getAllNames() as $name) {
+-			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
+-				return true;
+-			}
+-		}
+-	}
++//	foreach ($media['LINKS'] as $id=>$type) {
++//		$record=WT_GedcomRecord::getInstance($id);
++//		foreach ($record->getAllNames() as $name) {
++//			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
++//				return true;
++//			}
++//		}
++//	}
+ 	return false;
+ }
+[2026-01-27 02:07:48] 
+ACTUAL MESSAGE: comment out portions of filterMedia2 which are currently non-functional
+[2026-01-27 02:07:48] GENERATED MESSAGE: Add support for filter strings in media object.
+[2026-01-27 02:07:48] ==================================================
+
+[2026-01-27 02:07:53] Checkpoint saved at step 77500
+[2026-01-27 02:11:00] 
+==================================================
+[2026-01-27 02:11:00] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:11:00] DIFF:
+FILE: src/ResourceGenerator.php
+@@ -192,7 +192,8 @@ class ResourceGenerator
+             dirname(__DIR__) .
+             DIRECTORY_SEPARATOR .
+             '.php_cs ' .
+-            ' --allow-risky=yes -q -v --stop-on-violation --using-cache=no';
++            ' --allow-risky=yes -q -v --stop-on-violation --using-cache=no' .
++            ' 2>&1';
+         exec($command);
+     }
+[2026-01-27 02:11:00] 
+ACTUAL MESSAGE: Redirect STDERR into STDOUT
+[2026-01-27 02:11:00] GENERATED MESSAGE: [CoreBundle] Fix warning in resource generator (#)
+[2026-01-27 02:11:00] ==================================================
+
+[2026-01-27 02:11:04] Checkpoint saved at step 78000
+[2026-01-27 02:14:16] 
+==================================================
+[2026-01-27 02:14:16] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:14:16] DIFF:
+FILE: warcio/checker.py
+@@ -31,7 +31,8 @@ class Checker(object):
+     def process_one(self, filename):
+         printed_filename = False
+         with open(filename, 'rb') as stream:
+-            for record in ArchiveIterator(stream, check_digests=True):
++            it = ArchiveIterator(stream, check_digests=True)
++            for record in it:
+                 digest_present = (record.rec_headers.get_header('WARC-Payload-Digest') or
+                                   record.rec_headers.get_header('WARC-Block-Digest'))
+@@ -42,6 +43,7 @@ class Checker(object):
+                 rec_id = record.rec_headers.get_header('WARC-Record-ID')
+                 rec_type = record.rec_headers.get_header('WARC-Type')
++                rec_offset = it.get_record_offset()
+                 if record.digest_checker.passed is False:
+                     self.exit_value = 1
+@@ -61,7 +63,7 @@ class Checker(object):
+                     if not printed_filename:
+                         print(filename)
+                         printed_filename = True
+-                    print(' ', 'WARC-Record-ID', rec_id, rec_type)
++                    print(' ', 'offset', rec_offset, 'WARC-Record-ID', rec_id, rec_type)
+                     if d_msg:
+                         print('   ', d_msg)
+                     for o in output:
+[2026-01-27 02:14:16] 
+ACTUAL MESSAGE: include record offsets in `warcio check` output (#)
+[2026-01-27 02:14:16] GENERATED MESSAGE: DIFF:
+FILE: warcio/checker.py
+@@ -31,7 +31,8 @@ class Checker(object):
+     def process_one(self, filename):
+         printed_filename = False
+         with open(filename, 'rb') as stream:
+-            for record in ArchiveIterator(stream, check_digests=True):
++            it = ArchiveIterator(stream, check_digests=True)
++            for record in it:
+                 digest_present = (record.rec_headers.get_header('WARC-Payload-Digest') or
+                                   record.rec_headers.get_header('WARC-Block-Digest'))
+@@ -42,6 +43,7 @@ class Checker(object):
+                 rec_id = record.rec_headers.get_header('WARC-Record-ID')
+                 rec_type = record.rec_headers.get_header('WARC-Type')
++                rec_offset = it.get_record_offset()
+                 if record.digest_checker.passed is False:
+                     self.exit_value = 1
+@@ -61,7 +63,7 @@ class Checker(object):
+                     if not printed_filename:
+                         print(filename)
+           except Exception as e:  # pylint: disable=abstract-method-defined-inheritance-of-class-variable-return-on-exception-when-no
+[2026-01-27 02:14:16] ==================================================
+
+[2026-01-27 02:14:21] Checkpoint saved at step 78500
+[2026-01-27 02:17:29] 
+==================================================
+[2026-01-27 02:17:29] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:17:29] DIFF:
+FILE: salt/modules/virt.py
+@@ -1832,18 +1832,8 @@ def list_snapshots(vm=None):
+         salt '*' virt.list_snapshots
+         salt '*' virt.list_snapshots <domain>
+     '''
+-    vms = list_vms()
+-    if not vms:
+-        raise CommandExecutionError('No any virtual machine found.')
+-
+-    if vm:
+-        if vm not in vms:
+-            raise CommandExecutionError('Virtual Machine "{0}" was not found'.format(vm))
+-        else:
+-            vms = [vm]
+-
+     ret = dict()
+-    for domain in _get_domain(*vms, iterable=True):
++    for domain in _get_domain(*(vm and [vm] or list()), iterable=True):
+         ret[domain.name()] = [_parse_snapshot_description(snap.getXMLDesc()) for snap in domain.listAllSnapshots()]
+     return ret
+[2026-01-27 02:17:29] 
+ACTUAL MESSAGE: Remove redundant checks. Refactoring.
+[2026-01-27 02:17:29] GENERATED MESSAGE: Remove vm check from virt list. (#)
+[2026-01-27 02:17:29] ==================================================
+
+[2026-01-27 02:17:34] Checkpoint saved at step 79000
+[2026-01-27 02:20:39] 
+==================================================
+[2026-01-27 02:20:39] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:20:39] DIFF:
+FILE: spec/unit/request_spec.rb
+@@ -567,7 +567,8 @@ describe RestClient::Request, :include_helpers do
+       allow(ENV).to receive(:[]).with("http_proxy").and_return("
+       allow(ENV).to receive(:[]).with("no_proxy").and_return(nil)
+       allow(ENV).to receive(:[]).with("NO_PROXY").and_return(nil)
+-      allow(ENV).to receive(:[]).with("NETRC").and_return(nil)
++      allow(Netrc).to receive(:read).and_return({})
++
+       req = RestClient::Request.new(:method => :put, :url => ' :payload => 'payload')
+       obj = req.net_http_object('host', 80)
+       expect(obj.proxy?).to be true
+[2026-01-27 02:20:39] 
+ACTUAL MESSAGE: Stub out Netrc.read in tests (avoid ENV calls).
+This fixes tests on Windows, where Netrc tries to read several differen
+ENV variables like HOMEDRIVE and HOMEPATH.
+[2026-01-27 02:20:39] GENERATED MESSAGE: Added Netrc support to request spec
+[2026-01-27 02:20:39] ==================================================
+
+[2026-01-27 02:20:43] Checkpoint saved at step 79500
+[2026-01-27 02:23:53] 
+==================================================
+[2026-01-27 02:23:53] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:23:53] DIFF:
+FILE: index.js
+@@ -92,6 +92,7 @@ var Wire = function() {
+ 	this.uploaded = 0;
+ 	this.downloaded = 0;
++	this.finished = false;
+ 	this._requests = new CallbackStore();
+ 	this._peerRequests = new CallbackStore();
+@@ -103,6 +104,7 @@ var Wire = function() {
+ 	});
+ 	this.on('finish', function() {
++		self.finished = true;
+ 		self.push(null); // cannot be half open
+ 		clearInterval(self._keepAlive);
+ 		self._parse(Number.MAX_VALUE, noop);
+@@ -227,6 +229,7 @@ Wire.prototype.__defineGetter__('requests', function() {
+ Wire.prototype.request = function(i, offset, length, callback) {
+ 	if (!callback) callback = noop;
+ 	if (this.peerChoking) return callback(new Error('peer is choking'));
++	if (this.finished) return callback(new Error('wire is closed'));
+ 	this._requests.push(i, offset, length, callback);
+ 	this._message(ID_REQUEST, [i, offset, length]);
+ };
+[2026-01-27 02:23:53] 
+ACTUAL MESSAGE: small edge-case rc fix for request
+[2026-01-27 02:23:53] GENERATED MESSAGE: added finished flag to wire request
+[2026-01-27 02:23:53] ==================================================
+
+[2026-01-27 02:23:57] Checkpoint saved at step 80000
+[2026-01-27 02:27:03] 
+==================================================
+[2026-01-27 02:27:03] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:27:03] DIFF:
+FILE: lib/charlotte.js
+@@ -1757,12 +1757,12 @@
+             settings.requestId = loadRequestId = request(loadSettings, 
+               function(err, bundle, html, triggerReady) {
+                 if (err instanceof RedirectError && followRedirects) {
+-                  var location = err.location;
++                  var parsedLocation = shared.parseUrl(err.location);
+                   loadInProgress = false;
+                   loadStageCtr.parentNode.removeChild(loadStageCtr);
+-                  if (shared.parseUrl(location).path == shared.parseUrl(self.last().url).path) {
++                  if (parsedLocation.path === shared.parseUrl(self.last().url).path) {
+                     self.reload(null, true, location);
+-                  } else if (location == self.previous().url) {
++                  } else if (parsedLocation.path === shared.parseUrl(self.previous().url).path) {
+                     self.back();
+                     self.reload();
+                   } else {
+[2026-01-27 02:27:03] 
+ACTUAL MESSAGE: make url comparison path-based for going back in redirect special handling
+[2026-01-27 02:27:03] GENERATED MESSAGE: Fixed bug where redirects were not being parsed correctly
+[2026-01-27 02:27:03] ==================================================
+
+[2026-01-27 02:27:08] Checkpoint saved at step 80500
+[2026-01-27 02:30:15] 
+==================================================
+[2026-01-27 02:30:15] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:30:15] DIFF:
+FILE: solidity/test/ConverterLiquidity.js
+@@ -83,7 +83,7 @@ contract('ConverterLiquidity', accounts => {
+             it('should revert if the minimum-return is larger than the return', async () => {
+                 await Promise.all(reserveTokens.map((reserveToken, i) => approve(reserveToken, converter, reserveAmounts[i])));
+-                await expectRevert(converter.addLiquidity(reserveTokens, reserveAmounts, -1), 'ERR_RETURN_TOO_LOW');
++                await expectRevert(converter.addLiquidity(reserveTokens, reserveAmounts, MAX_UINT256), 'ERR_RETURN_TOO_LOW');
+             });
+             it('should revert if any of the input reserve amounts is not larger than zero', async () => {
+[2026-01-27 02:30:15] 
+ACTUAL MESSAGE: Refactor to MAX_UINT
+[2026-01-27 02:30:15] GENERATED MESSAGE: fix(solidity): fix typo (#)
+[2026-01-27 02:30:15] ==================================================
+
+[2026-01-27 02:30:19] Checkpoint saved at step 81000
+[2026-01-27 02:33:27] 
+==================================================
+[2026-01-27 02:33:27] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:33:27] DIFF:
+FILE: vobject/vcard.py
+@@ -4,7 +4,7 @@ import codecs
+ from . import behavior
+-from .base import ContentLine, registerBehavior, backslashEscape
++from .base import ContentLine, registerBehavior, backslashEscape, str_
+ from .icalendar import stringToTextValues
+@@ -41,7 +41,7 @@ class Name(object):
+     def __str__(self):
+         eng_order = ('prefix', 'given', 'additional', 'family', 'suffix')
+         out = ' '.join(self.toString(getattr(self, val)) for val in eng_order)
+-        return out
++        return str_(out)
+     def __repr__(self):
+         return "<Name: {0!s}>".format(self.__str__())
+[2026-01-27 02:33:27] 
+ACTUAL MESSAGE: make sure Name objects are correctly encoded before serialization
+[2026-01-27 02:33:27] GENERATED MESSAGE: Replace str with str_.
+[2026-01-27 02:33:27] ==================================================
+
+[2026-01-27 02:33:32] Checkpoint saved at step 81500
+[2026-01-27 02:36:39] 
+==================================================
+[2026-01-27 02:36:39] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:36:39] DIFF:
+FILE: lib/background.js
+@@ -1,6 +1,7 @@
+ var path = require('path');
+ var nightwatch = require('nightwatch');
+ var originalArgv = JSON.parse(process.argv[2]);
++var log = require('fancy-log');
+ nightwatch.cli(function(argv) {
+   for (var key in originalArgv) {
+@@ -14,5 +15,15 @@ nightwatch.cli(function(argv) {
+     argv.test = path.resolve(argv.test);
+   }
+-  nightwatch.runner(argv);
++  const runner = nightwatch.CliRunner(argv);
++  runner.setup()
++    .startWebDriver()
++    .then(() => {
++      return runner.runTests();
++    })
++    .then(() => {
++      return runner.stopWebDriver();
++    }).catch(err => {
++      log.error(err);
++    });
+ });
+[2026-01-27 02:36:39] 
+ACTUAL MESSAGE: Adjust to the new api of Nightwatch
+Updating Nightwatch from .x to .x changed Nightwatch API a little,
+so adjust gulp-nightwatch to the new api of Nightwatch.
+[2026-01-27 02:36:39] GENERATED MESSAGE: feat(background): start webdriver before running tests
+[2026-01-27 02:36:39] ==================================================
+
+[2026-01-27 02:36:43] Checkpoint saved at step 82000
+[2026-01-27 02:39:50] 
+==================================================
+[2026-01-27 02:39:50] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:39:50] DIFF:
+FILE: lib/resources/Invoices.js
+@@ -16,11 +16,13 @@ module.exports = StripeResource.extend({
+   listLineItems: stripeMethod({
+     method: 'GET',
+     path: '{id}/lines',
++    methodType: 'list',
+   }),
+   listUpcomingLineItems: stripeMethod({
+     method: 'GET',
+     path: 'upcoming/lines',
++    methodType: 'list',
+   }),
+   markUncollectible: stripeMethod({
+[2026-01-27 02:39:50] 
+ACTUAL MESSAGE: Make autopagination functions work for listLineItems and listUpcomingLineItems
+[2026-01-27 02:39:50] GENERATED MESSAGE: Add list method type to invoice list
+[2026-01-27 02:39:50] ==================================================
+
+[2026-01-27 02:39:54] Checkpoint saved at step 82500
+[2026-01-27 02:43:05] 
+==================================================
+[2026-01-27 02:43:05] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:43:05] DIFF:
+FILE: blockstack_client/actions.py
+@@ -663,7 +663,7 @@ def cli_withdraw(args, password=None, interactive=True, wallet_keys=None, config
+         log.debug("recipient = {}".format(recipient_addr))
+         return {'error': 'Invalid address'}
+-    if not isinstance(amount, int):
++    if amount is not None not isinstance(amount, int):
+         log.debug("amount = {}".format(amount))
+         return {'error': 'Invalid amount'}
+@@ -2707,6 +2707,7 @@ def cli_api(args, config_path=CONFIG_PATH):
+     command: api
+     help: Control the RESTful API endpoint
+     arg: command (str) '"start", "stop", or "status"'
++    opt: secret (str) 'The password all RPC callers must use. Defaults to rpc_token in the config file.'
+     """
+     config_dir = CONFIG_DIR
+[2026-01-27 02:43:05] 
+ACTUAL MESSAGE: withdraw: it's okay for `amount` to be None; we'll calculate it later
+[2026-01-27 02:43:05] GENERATED MESSAGE: Add option to pass a secret to the api command
+[2026-01-27 02:43:05] ==================================================
+
+[2026-01-27 02:43:10] Checkpoint saved at step 83000
+[2026-01-27 02:46:15] 
+==================================================
+[2026-01-27 02:46:15] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:46:15] DIFF:
+FILE: lib/enumerize/value.rb
+@@ -4,6 +4,8 @@ module Enumerize
+   class Value < String
+     include Predicatable
++    attr_reader :value
++
+     def initialize(attr, name, value=nil)
+       @attr  = attr
+       @value = value || name.to_s
+@@ -11,10 +13,6 @@ module Enumerize
+       super(name.to_s)
+     end
+-    def value
+-      @value
+-    end
+-
+     def text
+       I18n.t(i18n_keys[0], :default => i18n_keys[1..-1])
+     end
+[2026-01-27 02:46:15] 
+ACTUAL MESSAGE: Use attr_reader for value rather than method
+[2026-01-27 02:46:15] GENERATED MESSAGE: Remove unused method from Value class
+[2026-01-27 02:46:15] ==================================================
+
+[2026-01-27 02:46:20] Checkpoint saved at step 83500
+[2026-01-27 02:49:30] 
+==================================================
+[2026-01-27 02:49:30] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:49:30] DIFF:
+FILE: lib/excon/ssl_socket.rb
+@@ -128,8 +128,6 @@ module Excon
+         else
+           @socket.connect
+         end
+-      rescue OpenSSL::SSL::SSLError
+-        raise
+       rescue Errno::ETIMEDOUT, Timeout::Error
+         raise Excon::Errors::Timeout.new('connect timeout reached')
+       end
+[2026-01-27 02:49:30] 
+ACTUAL MESSAGE: openssl errors should now raise anyway
+[2026-01-27 02:49:30] GENERATED MESSAGE: Remove raise from SSL socket rescue
+[2026-01-27 02:49:30] ==================================================
+
+[2026-01-27 02:49:34] Checkpoint saved at step 84000
+[2026-01-27 02:52:43] 
+==================================================
+[2026-01-27 02:52:43] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:52:43] DIFF:
+FILE: sos/archive.py
+@@ -357,7 +357,7 @@ class TarFileArchive(FileCacheArchive):
+     def _build_archive(self):
+         # python2.6 TarFile lacks the filter parameter
+-        if six.PY2 and sys.version_info[1] < 7:
++        if not six.PY3 and sys.version_info[1] < 7:
+             tar = _TarFile.open(self._archive_name, mode="w")
+         else:
+             tar = tarfile.open(self._archive_name, mode="w")
+[2026-01-27 02:52:43] 
+ACTUAL MESSAGE: [archive] invert sense of six.PY2 test
+Old versions of six do not include a 'PY2' attribute leading to
+an exception in sos_get_command_output(). Invert the sense of the
+test and check that six.PY3 is false instead as all versions of
+the module include this attribute.
+[2026-01-27 02:52:43] GENERATED MESSAGE: [archive] Fix issue with python3.
+[2026-01-27 02:52:43] ==================================================
+
+[2026-01-27 02:52:46] Checkpoint saved at step 84500
+[2026-01-27 02:55:54] 
+==================================================
+[2026-01-27 02:55:54] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:55:54] DIFF:
+FILE: redis_collections/lists.py
+@@ -80,7 +80,7 @@ class List(RedisCollection, collections.MutableSequence):
+     def __reversed__(self):
+         """Returns iterator for the sequence in reversed order."""
+-        return reversed(list(self._data()))
++        return reversed(list(self.__iter__()))
+     def _recalc_slice(self, start, stop):
+         """Slicing in Redis takes also the item at 'stop' index, so there is
+FILE: tests/test_lists.py
+@@ -226,6 +226,12 @@ class ListTest(RedisTestCase):
+         python_list[0]['one'] = 2
+         self.assertEqual(redis_cached[0], python_list[0])
++        self.assertEqual(
++            list(redis_cached), list(python_list)
++        )
++        self.assertEqual(
++            list(reversed(redis_cached)), list(reversed(python_list))
++        )
+         # Changes are not reflected in Redis until after sync
+         self.assertNotEqual(list(redis_cached._data())[0], python_list[0])
+[2026-01-27 02:55:54] 
+ACTUAL MESSAGE: Use cache for List.__reversed__
+[2026-01-27 02:55:54] GENERATED MESSAGE: Fix a bug in the list test.
+This commit fixes the bug introduced in <URL>
+[2026-01-27 02:55:54] ==================================================
+
+[2026-01-27 02:55:59] Checkpoint saved at step 85000
+[2026-01-27 02:59:07] 
+==================================================
+[2026-01-27 02:59:07] TEST ON RANDOM VAL DIFF:
+[2026-01-27 02:59:07] DIFF:
+FILE: system/Autoloader/Autoloader.php
+@@ -150,12 +150,7 @@ class Autoloader
+ 				return false;
+ 			}
+-			if ( ! file_exists($config[$class]))
+-			{
+-				return false;
+-			}
+-
+-			include $config[$class];
++			include_once $config[$class];
+ 		},
+ 			true,   // Throw exception
+ 			true    // Prepend
+[2026-01-27 02:59:07] 
+ACTUAL MESSAGE: Removed unneeded file_exists check. Throwing an error is a good thing, plus include_once is faster than file_exists, and it's silly to call both.
+[2026-01-27 02:59:07] GENERATED MESSAGE: Fixing a bug in the autocompiler that caused a crash if the class was not found.
+[2026-01-27 02:59:08] ==================================================
+
+[2026-01-27 02:59:12] Checkpoint saved at step 85500
+[2026-01-27 03:02:22] 
+==================================================
+[2026-01-27 03:02:22] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:02:22] DIFF:
+FILE: testdata/javascript/soy_usegoog_lib.js
+@@ -2513,7 +2513,7 @@ if (goog.DEPENDENCIES_ENABLED) {
+       var loader = this;
+       /** @param {string} path */
+-      function visitNode(path) {
++      var visitNode = function(path) {
+         if (path in deps.written) {
+           return;
+         }
+@@ -2544,7 +2544,7 @@ if (goog.DEPENDENCIES_ENABLED) {
+           seenScript[path] = true;
+           scripts.push(path);
+         }
+-      }
++      };
+       visitNode(pathToLoad);
+[2026-01-27 03:02:22] 
+ACTUAL MESSAGE: Add kind="" to {param}.
+-------------
+Created by MOE: <URL>
+[2026-01-27 03:02:22] GENERATED MESSAGE: testdata: fix typo in JS test
+This commit fixes a typo that was causing a test to fail.
+[2026-01-27 03:02:22] ==================================================
+
+[2026-01-27 03:02:27] Checkpoint saved at step 86000
+[2026-01-27 03:05:34] 
+==================================================
+[2026-01-27 03:05:34] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:05:34] DIFF:
+FILE: i3pystatus/cmus.py
+@@ -29,10 +29,8 @@ class Cmus(IntervalModule):
+     """
+     settings = (
+-        ('format', 'format string, available formatters: status, song_elapsed, '
+-                   'song_length, artist, title, album, tracknumber, file, '
+-                   'stream, bitrate'),
+-        'color',
++        ('format', 'formatp string'),
++        ('color', 'The color of the text'),
+     )
+     color = '#909090'
+     format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
+[2026-01-27 03:05:34] 
+ACTUAL MESSAGE: cmus - Update settings information
+- Remove duplicate information (available formatters are also listed in
+  docstriong)
+- Add description for 'color' setting
+[2026-01-27 03:05:34] GENERATED MESSAGE: removed color from cmus settings
+[2026-01-27 03:05:34] ==================================================
+
+[2026-01-27 03:05:38] Checkpoint saved at step 86500
+[2026-01-27 03:08:47] 
+==================================================
+[2026-01-27 03:08:47] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:08:47] DIFF:
+FILE: contrib/ruby_event_store-outbox/spec/consumer_spec.rb
+@@ -5,8 +5,8 @@ module RubyEventStore
+     RSpec.describe Consumer do
+       include SchemaHelper
+-      let(:redis_url) { 'redis://localhost:6379/1' }
+-      let(:database_url) { 'sqlite3:db.sqlite3' }
++      let(:redis_url) { ENV["REDIS_URL"] }
++      let(:database_url) { ENV["DATABASE_URL"] }
+       let(:redis) { Redis.new(url: redis_url) }
+       around(:each) do |example|
+[2026-01-27 03:08:47] 
+ACTUAL MESSAGE: Use databases provided from env vars when running tests
+[2026-01-27 03:08:47] GENERATED MESSAGE: Redis URL should be a constant, not a string
+[2026-01-27 03:08:47] ==================================================
+
+[2026-01-27 03:08:51] Checkpoint saved at step 87000
+[2026-01-27 03:12:00] 
+==================================================
+[2026-01-27 03:12:00] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:12:00] DIFF:
+FILE: src/core/scene/a-scene.js
+@@ -661,6 +661,9 @@ module.exports.AScene = registerElement('a-scene', {
+           var vrManager = this.renderer.xr;
+           AEntity.prototype.play.call(this);  // .play() *before* render.
++          // WebXR Immersive navigation handler.
++          navigator.xr.addEventListener('sessiongranted', function () { sceneEl.enterVR(); });
++
+           if (sceneEl.renderStarted) { return; }
+           sceneEl.resize();
+[2026-01-27 03:12:00] 
+ACTUAL MESSAGE: Add handler for experimental sessiongranted event enabling WebXR immersive navigation (fix #)
+[2026-01-27 03:12:00] GENERATED MESSAGE: fix(scene): add sessiongrant event handler
+[2026-01-27 03:12:00] ==================================================
+
+[2026-01-27 03:12:04] Checkpoint saved at step 87500
+[2026-01-27 03:15:13] 
+==================================================
+[2026-01-27 03:15:13] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:15:13] DIFF:
+FILE: server/api.js
+@@ -35,6 +35,7 @@ api.GET('/events', async (req, res) => {
+       return 400
+     }
++    res.setTimeout(0)
+     res.set({
+       'Connection': 'keep-alive',
+       'Content-Type': 'text/event-stream; charset=utf-8',
+[2026-01-27 03:15:13] 
+ACTUAL MESSAGE: fix: disable response timeout on event-streams
+[2026-01-27 03:15:13] GENERATED MESSAGE: fix(server): set timeout to  seconds
+[2026-01-27 03:15:13] ==================================================
+
+[2026-01-27 03:15:17] Checkpoint saved at step 88000
+[2026-01-27 03:18:27] 
+==================================================
+[2026-01-27 03:18:27] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:18:27] DIFF:
+FILE: npm/test.js
+@@ -11,8 +11,7 @@ async.series([
+     require('./cache'),
+     require('./test-unit'),
+     require('./test-integration'),
+-    // run the browser tests locally and not on CI
+-    process.env.CI ? async.constant() : require('./test-browser')
++    require('./test-browser')
+ ], function (code) {
+     !code && console.log(colors.green('\n' + require('../package.json').name + ' tests: all ok!'));
+     exit(code);
+[2026-01-27 03:18:27] 
+ACTUAL MESSAGE: Enabled CI browser tests in the test bootstrapper
+[2026-01-27 03:18:27] GENERATED MESSAGE: chore(npm): fix CI test runner (#)
+[2026-01-27 03:18:27] ==================================================
+
+[2026-01-27 03:18:31] Checkpoint saved at step 88500
+[2026-01-27 03:21:40] 
+==================================================
+[2026-01-27 03:21:40] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:21:40] DIFF:
+FILE: src/Illuminate/Foundation/Testing/Concerns/MocksApplicationServices.php
+@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
+ use Mockery;
+ use Exception;
++use Illuminate\Database\Eloquent\Model;
+ trait MocksApplicationServices
+ {
+@@ -88,7 +89,14 @@ trait MocksApplicationServices
+             $this->firedEvents[] = $called;
+         });
++        $mock->shouldReceive('until')->andReturnUsing(function ($called) {
++            $this->firedEvents[] = $called;
++
++            return true;
++        });
++
+         $this->app->instance('events', $mock);
++        Model::setEventDispatcher($mock);
+         return $this;
+     }
+[2026-01-27 03:21:40] 
+ACTUAL MESSAGE: Add support for testing eloquent model events
+[2026-01-27 03:21:40] GENERATED MESSAGE: Mock ApplicationServices to return when firing events
+[2026-01-27 03:21:40] ==================================================
+
+[2026-01-27 03:21:44] Checkpoint saved at step 89000
+[2026-01-27 03:24:51] 
+==================================================
+[2026-01-27 03:24:51] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:24:51] DIFF:
+FILE: activerecord/lib/active_record/callbacks.rb
+@@ -5,7 +5,7 @@ module ActiveRecord
+   # before or after an alteration of the object state. This can be used to make sure that associated and
+   # dependent objects are deleted when +destroy+ is called (by overwriting +before_destroy+) or to massage attributes
+   # before they're validated (by overwriting +before_validation+). As an example of the callbacks initiated, consider
+-  # the <tt>Base#save</tt> call:
++  # the <tt>Base#save</tt> call for a new record:
+   #
+   # * (-) <tt>save</tt>
+   # * (-) <tt>valid</tt>
+@@ -22,7 +22,8 @@ module ActiveRecord
+   # * (8) <tt>after_save</tt>
+   #
+   # That's a total of eight callbacks, which gives you immense power to react and prepare for each state in the
+-  # Active Record lifecycle.
++  # Active Record lifecycle. The sequence for calling <tt>Base#save</tt> an existing record is similar, except that each 
++  # <tt>_on_create</tt> callback is replaced by the corresponding <tt>_on_update</tt> callback.
+   #
+   # Examples:
+   #   class CreditCard < ActiveRecord::Base
+[2026-01-27 03:24:51] 
+ACTUAL MESSAGE: Clarify that the event sequence shown in the comments applies to new records only.
+[2026-01-27 03:24:51] GENERATED MESSAGE: Fix typo in docstring.
+[2026-01-27 03:24:51] ==================================================
+
+[2026-01-27 03:24:55] Checkpoint saved at step 89500
+[2026-01-27 03:28:02] 
+==================================================
+[2026-01-27 03:28:02] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:28:02] DIFF:
+FILE: skyfield/constants.py
+@@ -14,12 +14,12 @@ pi = 3.141592653589793
+ tau = 6.283185307179586476925287  # lower case, for symmetry with math.pi
+ # Physics.
+-C = 299792458.0
++C = 299792458.0                            # m/s
+ GM_SUN_Pitjeva_2005_km3_s2 = 132712440042  # Elena Pitjeva, 2015JPCRD..44c1210P
+ # Earth and its orbit.
+-ANGVEL = 7.2921150e-5
+-ERAD = 6378136.6
++ANGVEL = 7.2921150e-5           # radians/s
++ERAD = 6378136.6                # meters
+ IERS_2010_INVERSE_EARTH_FLATTENING = 298.25642
+ # Heliocentric gravitational constant in meters^3 / second^2, from DE-405.
+[2026-01-27 03:28:02] 
+ACTUAL MESSAGE: Note the units of a few constants
+[2026-01-27 03:28:02] GENERATED MESSAGE: [AIRFLOW-] Update constant for distance between sun and moon. (#)
+[2026-01-27 03:28:02] ==================================================
+
+[2026-01-27 03:28:07] Checkpoint saved at step 90000
+[2026-01-27 03:31:13] 
+==================================================
+[2026-01-27 03:31:13] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:31:13] DIFF:
+FILE: www/src/Lib/sys.py
+@@ -68,6 +68,10 @@ def getrecursionlimit():
+ def intern(string):
+     return string
++class int_info:
++    bits_per_digit = 30
++    sizeof_digit = 4
++
+ maxsize = 2 ** 63 - 1
+ maxunicode = 1114111
+[2026-01-27 03:31:13] 
+ACTUAL MESSAGE: Add sys.int_info (as a class, not namedtuple)
+[2026-01-27 03:31:13] GENERATED MESSAGE: Add int info to sys.intern
+[2026-01-27 03:31:13] ==================================================
+
+[2026-01-27 03:31:18] Checkpoint saved at step 90500
+[2026-01-27 03:34:27] 
+==================================================
+[2026-01-27 03:34:27] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:34:27] DIFF:
+FILE: salt/modules/rh_ip.py
+@@ -957,7 +957,7 @@ def build_routes(iface, **settings):
+     '''
+     template = 'rh6_route_eth.jinja'
+-    if float(__grains__['osrelease']) < 6:
++    if __grains__['osmajorrelease'] < 6:
+         template = 'route_eth.jinja'
+     log.debug('Template name: ' + template)
+[2026-01-27 03:34:27] 
+ACTUAL MESSAGE: Fixed a ValueError in rh_ip.py
+[2026-01-27 03:34:27] GENERATED MESSAGE: Use os majorrelease instead of os minor
+[2026-01-27 03:34:27] ==================================================
+
+[2026-01-27 03:34:32] Checkpoint saved at step 91000
+[2026-01-27 03:37:41] 
+==================================================
+[2026-01-27 03:37:41] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:37:41] DIFF:
+FILE: lib/ohm.rb
+@@ -695,6 +695,7 @@ module Ohm
+     end
+     def index_key_for(att, value)
++      raise ArgumentError unless indices.include?(att)
+       self.class.key(att, self.class.encode(value))
+     end
+FILE: test/validations_test.rb
+@@ -123,6 +123,18 @@ class ValidationsTest < Test::Unit::TestCase
+         assert @event.valid?
+       end
+     end
++
++    context "That defines a unique validation on a non indexed attribute" do
++      should "raise ArgumentError" do
++        def @event.validate
++          assert_unique :capacity
++        end
++
++        assert_raise ArgumentError do
++          @event.valid?
++        end
++      end
++    end
+   end
+   context "An existing model with a valid name" do
+[2026-01-27 03:37:41] 
+ACTUAL MESSAGE: Adds guard that raises ArgumentError when atempting to use an undefined index
+[2026-01-27 03:37:41] GENERATED MESSAGE: Raise an error if an index key is missing from a model.
+[2026-01-27 03:37:41] ==================================================
+
+[2026-01-27 03:37:45] Checkpoint saved at step 91500
+[2026-01-27 03:40:53] 
+==================================================
+[2026-01-27 03:40:53] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:40:53] DIFF:
+FILE: mrblib/version.rb
+@@ -1,3 +1,3 @@
+ module CallbacksAttachable
+-  VERSION = "1.2.0"
++  VERSION = "2.0.0"
+ end
+[2026-01-27 03:40:53] 
+ACTUAL MESSAGE: bumped version to
+[2026-01-27 03:40:53] GENERATED MESSAGE: Bumped version to
+[2026-01-27 03:40:53] ==================================================
+
+[2026-01-27 03:40:56] Checkpoint saved at step 92000
+[2026-01-27 03:51:13] Summary Epoch 4: Train Loss: 1.3628| Train Accuracy: 0.7265        | Val Loss: 1.3825| Val Accuracy: 0.7283)| PPL: 3.9850
+[2026-01-27 03:51:15] >>> New best model saved!
+[2026-01-27 03:53:16] 
+==================================================
+[2026-01-27 03:53:16] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:53:16] DIFF:
+FILE: lib/vcard.rb
+@@ -4,8 +4,8 @@ class Vcard < ActiveRecord::Base
+   has_many :addresses
+-  named_scope :active, :conditions => {:active => true}
+-  named_scope :by_name, lambda {|name| {:conditions => self.by_name_conditions(name)}}
++  scope :active, :conditions => {:active => true}
++  scope :by_name, lambda {|name| {:conditions => self.by_name_conditions(name)}}
+   belongs_to :object, :polymorphic => true
+@@ -130,7 +130,7 @@ end
+ module VcardClassMethods
+   def has_vcards(options = {})
+     class_eval <<-end_eval
+-      named_scope :by_name, lambda {|name| {:include => :vcard, :order => 'vcards.full_name', :conditions => Vcard.by_name_conditions(name)}}
++      scope :by_name, lambda {|name| {:include => :vcard, :order => 'vcards.full_name', :conditions => Vcard.by_name_conditions(name)}}
+       has_one :vcard, :as => 'object'
+       has_many :vcards, :as => 'object'
+[2026-01-27 03:53:16] 
+ACTUAL MESSAGE: Use scope, not named_scope.
+[2026-01-27 03:53:16] GENERATED MESSAGE: Rename scope to scope.
+[2026-01-27 03:53:16] ==================================================
+
+[2026-01-27 03:53:21] Checkpoint saved at step 92500
+[2026-01-27 03:56:28] 
+==================================================
+[2026-01-27 03:56:28] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:56:28] DIFF:
+FILE: client/webpack.config.js
+@@ -13,7 +13,6 @@ module.exports = {
+         path: path.join.apply(null, context.concat("dist")),
+         filename: 'index.js',
+     },
+-    devtool: "source-map",
+     plugins: [
+         // new webpack.NoEmitOnErrorsPlugin(),
+     ],
+[2026-01-27 03:56:28] 
+ACTUAL MESSAGE: fix: remove source-maps from client - fixes #
+[2026-01-27 03:56:28] GENERATED MESSAGE: chore(devtool): remove sourcemap plugin (#)
+[2026-01-27 03:56:28] ==================================================
+
+[2026-01-27 03:56:33] Checkpoint saved at step 93000
+[2026-01-27 03:59:40] 
+==================================================
+[2026-01-27 03:59:40] TEST ON RANDOM VAL DIFF:
+[2026-01-27 03:59:40] DIFF:
+FILE: lib/compass.js
+@@ -19,7 +19,9 @@ var spawn = require('child_process').spawn,
+         logging: true,
+         load_all: false,
+         project: process.cwd(),
+-        bundle_exec: false
++        bundle_exec: false,
++        debug: false,
++        time: false
+     },
+     isArray = Array.isArray || function(obj) {
+         return Object.prototype.toString.call(obj) === '[object Array]';
+@@ -70,6 +72,8 @@ module.exports = function(file, opts, callback) {
+     } else {
+         if (!opts.comments) { options.push('--no-line-comments'); }
+         if (opts.relative) { options.push('--relative-assets'); }
++        if (opts.debug) { options.push('--debug-info'); }
++        if (opts.time) { options.push('--time'); }
+         options.push('--output-style', opts.style);
+         options.push('--css-dir', opts.css);
+         options.push('--sass-dir', opts.sass);
+[2026-01-27 03:59:40] 
+ACTUAL MESSAGE: Added options
+Added options for debug info and compile time output
+[2026-01-27 03:59:40] GENERATED MESSAGE: Add debug option to Compass
+[2026-01-27 03:59:40] ==================================================
+
+[2026-01-27 03:59:44] Checkpoint saved at step 93500
+[2026-01-27 04:02:52] 
+==================================================
+[2026-01-27 04:02:52] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:02:52] DIFF:
+FILE: system/src/Grav/Common/Data/Validation.php
+@@ -375,7 +375,7 @@ class Validation
+      * @param  array  $field   Blueprint for the field.
+      * @return bool   True if validation succeeded.
+      */
+-    public static function typeDatetime_local($value, array $params, array $field)
++    public static function typeDatetimeLocal($value, array $params, array $field)
+     {
+         return self::typeDatetime($value, $params, $field);
+     }
+[2026-01-27 04:02:52] 
+ACTUAL MESSAGE: PSR camelCase fix
+[2026-01-27 04:02:52] GENERATED MESSAGE: Changed type datetime to local
+[2026-01-27 04:02:52] ==================================================
+
+[2026-01-27 04:02:56] Checkpoint saved at step 94000
+[2026-01-27 04:06:06] 
+==================================================
+[2026-01-27 04:06:06] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:06:06] DIFF:
+FILE: src/internal/fragments/dom.js
+@@ -853,7 +853,7 @@
+ 		},
+ 		render: function ( value ) {
+-			this.node.data = value;
++			this.node.data = ( value === undefined ? '' : value );
+ 		},
+ 		firstNode: function () {
+@@ -906,6 +906,11 @@
+ 				this.parentNode.removeChild( this.nodes.pop() );
+ 			}
++			if ( html === undefined ) {
++				this.nodes = [];
++				return;
++			}
++
+ 			// get new nodes
+ 			this.nodes = insertHtml( html, this.docFrag );
+[2026-01-27 04:06:06] 
+ACTUAL MESSAGE: handle undefined with interpolators and triples
+[2026-01-27 04:06:06] GENERATED MESSAGE: fix(dom): don't throw error if node is undefined
+[2026-01-27 04:06:06] ==================================================
+
+[2026-01-27 04:06:10] Checkpoint saved at step 94500
+[2026-01-27 04:09:20] 
+==================================================
+[2026-01-27 04:09:20] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:09:20] DIFF:
+FILE: bundles/org.eclipse.orion.client.core/web/orion/sites/sitesExplorer.js
+@@ -372,6 +372,12 @@ define(['i18n!orion/sites/nls/messages', 'orion/i18nUtil', 'dojo', 'orion/Deferr
+ 				commandService.registerCommandContribution("viewOnSiteScope", "orion.site.add-to", 10); //$NON-NLS-1$ //$NON-NLS-0$
+ 				commandService.registerCommandContribution("viewOnSiteScope", "orion.site.view-on-link", 20); //$NON-NLS-1$ //$NON-NLS-0$
++				mGlobalCommands.setPageTarget({
++						task: messages.ViewOnSiteTitle,
++						target: file,
++						serviceRegistry: serviceRegistry,
++						commandService: commandService});
++
+ 				options.addToCallback = function() {
+ 					self.refresh();
+ 				};
+[2026-01-27 04:09:20] 
+ACTUAL MESSAGE: View on site: set pageTarget to the file/folder
+[2026-01-27 04:09:20] GENERATED MESSAGE: [Bundle] Add view on site title to the list of available commands.
+[2026-01-27 04:09:20] ==================================================
+
+[2026-01-27 04:09:24] Checkpoint saved at step 95000
+[2026-01-27 04:12:31] 
+==================================================
+[2026-01-27 04:12:31] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:12:31] DIFF:
+FILE: tests/integration/conftest.py
+@@ -1,12 +1,26 @@
++DEPLOY_TEST_BASENAME = 'test_features.py'
++
++
+ def pytest_collection_modifyitems(session, config, items):
+     # Ensure that all tests with require a redeploy are run after
+     # tests that don't need a redeploy.
+-    final_list = []
+-    on_redeploy_tests = []
+-    for item in items:
++    start, end = _get_start_end_index(DEPLOY_TEST_BASENAME, items)
++    marked = []
++    unmarked = []
++    for item in items[start:end]:
+         if item.get_marker('on_redeploy') is not None:
+-            on_redeploy_tests.append(item)
++            marked.append(item)
+         else:
+-            final_list.append(item)
+-    final_list.extend(on_redeploy_tests)
+-    items[:] = final_list
++            unmarked.append(item)
++    items[start:end] = unmarked + marked
++
++
++def _get_start_end_index(basename, items):
++    # precondition: all the tests for test_features.py are
++    # in a contiguous range.  This is the case because pytest
++    # will group all tests in a module together.
++    matched = [item.fspath.basename == basename for item in items]
++    return (
++        matched.index(True),
++        len(matched) - list(reversed(matched)).index(True)
++    )
+[2026-01-27 04:12:31] 
+ACTUAL MESSAGE: Reorder redeploy tests within a single module
+The original code for on_redeploy was making the
+assumption that there was only one integration test file.
+When test_package.py was added, the tests always failed
+because the redeploy tests were run *after* the package tests
+which messed with the module scope fixtures.
+Now we ensure we only reorder tests within test_features.py.
+[2026-01-27 04:12:31] GENERATED MESSAGE: DIFF:
+FILE: tests/integration/conftest.py
+@@ -1,12 +1,26 @@
++DEPLOY_TEST_BASENAME = 'test_features.py'
++
++
+ def pytest_collection_modifyitems(session, config, items):
+     # Ensure that all tests with require a redeploy are run after
+     # tests that don't need a redeploy.
+-    final_list = []
+-    on_redeploy_tests = []
+-    for item in items:
++    start, end = _get_start_end_index(DEPLOY_TEST_BASENAME, items)
++    marked = []
++    unmarked = []
++    for item in items[start:end]:
+         if item.get_marker('on_redeploy') is not None:
+-            on_redeploy_tests.append(item)
++            marked.append(item)
+         else:
+-            final_list.append(item)
+-    final_list.extend(on_redeploy_tests)
+-    items[:] = final_list
++            unmarked.append(item)
++    items[start:end] = unmarked + marked
++
++
++def _get_start_end_index(basename, items):
++    # precondition: all the tests for test_features.py are
++    # in a contiguous range.  This is the case because pytest
++    # will group all tests in a module together.
++    matched = [item.fspath.basename == basename for item in items]
++    return (
++        matched.index(True),
++        len(matched) - list(reversed(matched)).index())
+
+COMMIT MESSA
+[2026-01-27 04:12:31] ==================================================
+
+[2026-01-27 04:12:35] Checkpoint saved at step 95500
+[2026-01-27 04:15:43] 
+==================================================
+[2026-01-27 04:15:43] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:15:43] DIFF:
+FILE: src/main/java/com/meetwise/fs/fat/Fat32BootSector.java
+@@ -163,6 +163,8 @@ public final class Fat32BootSector extends BootSector {
+     public void writeCopy(BlockDevice device) throws IOException {
+         if (getBootSectorCopySector() > 0) {
+             final long offset = getBootSectorCopySector() * SIZE;
++            buffer.rewind();
++            buffer.limit(buffer.capacity());
+             device.write(offset, buffer);
+         }
+     }
+[2026-01-27 04:15:43] 
+ACTUAL MESSAGE: Fixed writing FAT boot sector copy.
+[2026-01-27 04:15:43] GENERATED MESSAGE: Add buffer limit to write copy
+[2026-01-27 04:15:43] ==================================================
+
+[2026-01-27 04:15:48] Checkpoint saved at step 96000
+[2026-01-27 04:18:57] 
+==================================================
+[2026-01-27 04:18:57] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:18:57] DIFF:
+FILE: railties/lib/rails/generators/app_base.rb
+@@ -227,9 +227,9 @@ module Rails
+       def javascript_gemfile_entry
+         unless options[:skip_javascript]
+-          <<-GEMFILE
++          <<-GEMFILE.strip_heredoc
+             gem '#{options[:javascript]}-rails'
+-            
++
+             # Turbolinks makes following links in your web application faster. Read more: 
+             gem 'turbolinks'
+           GEMFILE
+[2026-01-27 04:18:57] 
+ACTUAL MESSAGE: Strip heredoc to not generate the Gemfile with trailing spaces
+[2026-01-27 04:18:57] GENERATED MESSAGE: Remove trailing whitespace from javascript gemfile entry.
+[2026-01-27 04:18:57] ==================================================
+
+[2026-01-27 04:19:02] Checkpoint saved at step 96500
+[2026-01-27 04:22:14] 
+==================================================
+[2026-01-27 04:22:14] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:22:14] DIFF:
+FILE: MAVProxy/modules/mavproxy_map/srtm.py
+@@ -263,26 +263,18 @@ class SRTMDownloader():
+         mp_util.child_close_fds()
+         if self.offline == 1:
+             return
+-        conn = httplib.HTTPConnection(self.server)
+-        conn.set_debuglevel(0)
+         filepath = "%s%s%s" % \
+                      (self.directory,continent,filename)
+         try:
+-            conn.request("GET", filepath)
+-            r1 = conn.getresponse()
+-            if r1.status==200:
+-                '''print "status200 received ok"'''
+-                data = r1.read()
++            data = self.getURIWithRedirect(filepath)
++            if data:
+                 self.ftpfile = open(os.path.join(self.cachedir, filename), 'wb')
+                 self.ftpfile.write(data)
+                 self.ftpfile.close()
+                 self.ftpfile = None
+-            else:
+-                '''print "oh no = status=%d %s" \
+-                % (r1.status,r1.reason)'''
+         except Exception as e:
+             if not self.first_failure:
+-                #print("SRTM Download failed: %s" % str(e))
++                print("SRTM Download failed %s on server %s" % (filepath, self.server))
+                 self.first_failure = True
+             pass
+[2026-01-27 04:22:14] 
+ACTUAL MESSAGE: map: cope with redirects on data files
+[2026-01-27 04:22:14] GENERATED MESSAGE: DIFF:
+FILE: MAVProxy/modules/mavproxy_map/srtm.py
+@@ -263,26 +263,18 @@ class SRTMDownloader():
+         mp_util.child_close_fds()
+         if self.offline == 1:
+             return
+-        conn = httplib.HTTPConnection(self.server)
+-        conn.set_debuglevel(0)
+         filepath = "%s%s%s" % \
+                      (self.directory,continent,filename)
+         try:
+-            conn.request("GET", filepath)
+-            r1 = conn.getresponse()
+-            if r1.status==200:
+-                '''print "status200 received ok"'''
+-                data = r1.read()
++            data = self.getURIWithRedirect(filepath)
++            if data:
+                 self.ftpfile = open(os.path.join(self.cachedir, filename), 'wb')
+                 self.ftpfile.write(data)
+                 self.ftpfile.close()
+                 self.ftpfile = None
+-            else:
+-                '''print "oh no = %s\n' % (r1,r2)'' % r2
+\ No newline at end of file
+
+COMMIT MESSA
+[2026-01-27 04:22:14] ==================================================
+
+[2026-01-27 04:22:19] Checkpoint saved at step 97000
+[2026-01-27 04:25:22] 
+==================================================
+[2026-01-27 04:25:22] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:25:22] DIFF:
+FILE: activerecord/lib/active_record/tasks/mysql_database_tasks.rb
+@@ -31,6 +31,7 @@ module ActiveRecord
+           end
+           establish_connection configuration
+         else
++          $stderr.puts error.inspect
+           $stderr.puts "Couldn't create database for #{configuration.inspect}, #{creation_options.inspect}"
+           $stderr.puts "(If you set the charset manually, make sure you have a matching collation)" if configuration['encoding']
+         end
+[2026-01-27 04:25:22] 
+ACTUAL MESSAGE: activerecord: rake db:create shows underlying error message.
+[2026-01-27 04:25:22] GENERATED MESSAGE: [#] Fix mysql database task output
+This commit fixes the output of the mysql db task.
+The error message is printed when you attempt to create a database with the
+database configuration set to
+[2026-01-27 04:25:22] ==================================================
+
+[2026-01-27 04:25:27] Checkpoint saved at step 97500
+[2026-01-27 04:28:35] 
+==================================================
+[2026-01-27 04:28:35] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:28:35] DIFF:
+FILE: lib/simplecov/source_file.rb
+@@ -34,17 +34,17 @@ module SimpleCov
+       # Returns true if this is a line that should have been covered, but was not
+       def missed?
+-        not never? and not skipped? and coverage.zero?
++        !never? and !skipped? and coverage.zero?
+       end
+       # Returns true if this is a line that has been covered
+       def covered?
+-        not never? and not skipped? and coverage > 0
++        !never? and !skipped? and coverage > 0
+       end
+       # Returns true if this line is not relevant for coverage
+       def never?
+-        not skipped? and coverage.nil?
++        !skipped? and coverage.nil?
+       end
+       # Flags this line as skipped
+[2026-01-27 04:28:35] 
+ACTUAL MESSAGE: Prefer ! to "not"
+[2026-01-27 04:28:35] GENERATED MESSAGE: Don't skip coverage if it's nil
+[2026-01-27 04:28:35] ==================================================
+
+[2026-01-27 04:28:39] Checkpoint saved at step 98000
+[2026-01-27 04:31:46] 
+==================================================
+[2026-01-27 04:31:46] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:31:46] DIFF:
+FILE: jest.config.js
+@@ -77,6 +77,8 @@ module.exports = {
+     '/generators/',
+     '/dll/',
+     '/__mocks__ /',
++    '/__mockdata__/',
++    '/__mocks-ng-workspace__/',
+     '/__testfixtures__/',
+     '^.*\\.stories\\.[jt]sx?$',
+   ],
+[2026-01-27 04:31:46] 
+ACTUAL MESSAGE: Remove mock directories from jest test coverage
+[2026-01-27 04:31:46] GENERATED MESSAGE: feat(jest): add mockdata to config
+[2026-01-27 04:31:46] ==================================================
+
+[2026-01-27 04:31:51] Checkpoint saved at step 98500
+[2026-01-27 04:34:57] 
+==================================================
+[2026-01-27 04:34:57] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:34:57] DIFF:
+FILE: lib/stalk_climber/version.rb
+@@ -1,4 +1,4 @@
+ module StalkClimber
+   # StalkClimber version number
+-  VERSION = '0.0.7'
++  VERSION = '0.1.0'
+ end
+[2026-01-27 04:34:57] 
+ACTUAL MESSAGE: Fix bad version. Should've kicked minor version
+[2026-01-27 04:34:57] GENERATED MESSAGE: Bumped version to
+[2026-01-27 04:34:57] ==================================================
+
+[2026-01-27 04:35:02] Checkpoint saved at step 99000
+[2026-01-27 04:38:11] 
+==================================================
+[2026-01-27 04:38:11] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:38:11] DIFF:
+FILE: lxc/query.go
+@@ -6,6 +6,7 @@ import (
+ 	"fmt"
+ 	"io/ioutil"
+ 	"net/http"
++	"net/url"
+ 	"github.com/spf13/cobra"
+@@ -127,7 +128,12 @@ func (c *cmdQuery) Run(cmd *cobra.Command, args []string) error {
+ 	}
+ 	if c.flagRespWait && resp.Operation != "" {
+-		resp, _, err = d.RawQuery("GET", fmt.Sprintf("%s/wait", resp.Operation), "", "")
++		uri, err := url.ParseRequestURI(resp.Operation)
++		if err != nil {
++			return err
++		}
++
++		resp, _, err = d.RawQuery("GET", fmt.Sprintf("%s/wait?%s", uri.Path, uri.RawQuery), "", "")
+ 		if err != nil {
+ 			return err
+ 		}
+[2026-01-27 04:38:11] 
+ACTUAL MESSAGE: lxc/query: Fix handling of ?project=
+[2026-01-27 04:38:11] GENERATED MESSAGE: lxc: Add GET and PATCH requests to query
+[2026-01-27 04:38:11] ==================================================
+
+[2026-01-27 04:38:15] Checkpoint saved at step 99500
+[2026-01-27 04:41:22] 
+==================================================
+[2026-01-27 04:41:22] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:41:22] DIFF:
+FILE: core/src/main/java/org/graphast/query/shortestpath/DijkstraStrategy.java
+@@ -4,6 +4,7 @@ import java.util.Iterator;
+ import java.util.PriorityQueue;
+ import java.util.Queue;
++import org.graphast.exceptions.NodeNotFoundException;
+ import org.graphast.model.Edge;
+ import org.graphast.model.Graph;
+ import org.graphast.query.utils.DistanceElement;
+@@ -24,6 +25,10 @@ public class DijkstraStrategy implements ShortestPathStrategy {
+ 	@Override
+ 	public DistanceVector run(long sourceId, long targetId) {
++		if(!g.containsNode(sourceId))
++			throw new NodeNotFoundException(sourceId);
++		if(targetId != -1 && !g.containsNode(targetId))
++			throw new NodeNotFoundException(targetId);
+ 		DistanceVector vector = new DistanceVector(sourceId);
+ 		Queue<DistanceElement> toVisit = new PriorityQueue<>();
+[2026-01-27 04:41:22] 
+ACTUAL MESSAGE: [#] Adding exception throw on Dijkstra strategy
+[2026-01-27 04:41:22] GENERATED MESSAGE: Throw exception if node not found in shortest path strategy
+[2026-01-27 04:41:22] ==================================================
+
+[2026-01-27 04:41:27] Checkpoint saved at step 100000
+[2026-01-27 04:44:34] 
+==================================================
+[2026-01-27 04:44:34] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:44:34] DIFF:
+FILE: lib/watch/assets.js
+@@ -23,8 +23,10 @@ function watchResource(src) {
+       , isLocal = src.startsWith(config.url)
+       , pathname = src && url.parse(src).pathname
+       , localPath = pathname && path.join(config.serve, pathname)
++      , parsedSheet = config.css.some(s => s.path === pathname)
++                   || Array.from(css.styles.values()).some(s => s.path === localPath)
+-  if (!localPath || !isLocal || !ext || ext === '.js' || Array.from(css.styles.values()).some(s => s.path === localPath))
++  if (!localPath || !isLocal || !ext || ext === '.js' || parsedSheet)
+     return
+   watch(localPath, absolutePath => {
+[2026-01-27 04:44:34] 
+ACTUAL MESSAGE: Don't watch parsed and injected css sheets
+[2026-01-27 04:44:34] GENERATED MESSAGE: fix(assets): check if local path is parsed
+[2026-01-27 04:44:34] ==================================================
+
+[2026-01-27 04:44:38] Checkpoint saved at step 100500
+[2026-01-27 04:47:44] 
+==================================================
+[2026-01-27 04:47:44] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:47:44] DIFF:
+FILE: ruby/neo4j/driver/internal/async/pool/connection_pool_impl.rb
+@@ -30,18 +30,18 @@ module Neo4j::Driver
+             channel_future = pool.acquire
+             channel_future.handle do |channel, error|
+-                begin
+-                  process_acquisition_error(pool, address, error)
+-                  assert_not_closed(address, channel, pool)
+-                  Connection::ChannelAttributes.set_authorization_state_listener(channel, channel_health_checker)
+-                  connection = connection_factory.create_connection(channel, pool)
+-
+-                  metrics_listener.after_acquired_or_created(pool.id, acquire_event)
+-                  connection
+-                ensure
+-                  metrics_listener.after_acquiring_or_creating(pool.id)
+-                end
++              begin
++                process_acquisition_error(pool, address, error)
++                assert_not_closed(address, channel, pool)
++                Connection::ChannelAttributes.set_authorization_state_listener(channel, channel_health_checker)
++                connection = connection_factory.create_connection(channel, pool)
++
++                metrics_listener.after_acquired_or_created(pool.id, acquire_event)
++                connection
++              ensure
++                metrics_listener.after_acquiring_or_creating(pool.id)
+               end
++            end
+           end
+           def retain_all(addresses_to_retain)
+[2026-01-27 04:47:44] 
+ACTUAL MESSAGE: Update ruby/neo4j/driver/internal/async/pool/connection_pool_impl.rb
+[2026-01-27 04:47:44] GENERATED MESSAGE: DIFF:
+FILE: ruby/neo4j/driver/internal/async/pool/connection_pool_impl.rb
+@@ -30,18 +30,18 @@ module Neo4j::Driver
+             channel_future = pool.acquire
+             channel_future.handle do |channel, error|
+-                begin
+-                  process_acquisition_error(pool, address, error)
+-                  assert_not_closed(address, channel, pool)
+-                  Connection::ChannelAttributes.set_authorization_state_listener(channel, channel_health_checker)
+-                  connection = connection_factory.create_connection(channel, pool)
+-
+-                  metrics_listener.after_acquired_or_created(pool.id, acquire_event)
+-                  connection
+-                ensure
+-                  metrics_listener.after_acquiring_or_creating(pool.id)
+-                end
++              begin
++                process_acquisition_error(pool, address, error)
++                assert_not_closed(address, channel, pool)
++                Connection::ChannelAttributes.set_authorization_state_listener(channel, channel_health_checker)
++        # TODO: this should be removed in a future release, but I don't think it's worth the time to do it.
+[2026-01-27 04:47:44] ==================================================
+
+[2026-01-27 04:47:49] Checkpoint saved at step 101000
+[2026-01-27 04:50:57] 
+==================================================
+[2026-01-27 04:50:57] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:50:57] DIFF:
+FILE: modules/http/src/retrofit/http/RestAdapter.java
+@@ -120,10 +120,10 @@ import retrofit.internal.gson.Gson;
+         httpClientProvider.get().execute(request, rh);
+       } catch (IOException e) {
+-        logger.log(Level.WARNING, e.getMessage(), e);
++        logger.log(Level.WARNING, e.getMessage() + " from " + server.apiUrl(), e);
+         callback.networkError();
+       } catch (Throwable t) {
+-        logger.log(Level.WARNING, t.getMessage(), t);
++        logger.log(Level.WARNING, t.getMessage() + " from " + server.apiUrl(), t);
+         callback.unexpectedError(t);
+       }
+     }
+[2026-01-27 04:50:57] 
+ACTUAL MESSAGE: Log the api url for failed requests
+[2026-01-27 04:50:57] GENERATED MESSAGE: http: fix exception logging in RestAdapter (#)
+[2026-01-27 04:50:57] ==================================================
+
+[2026-01-27 04:51:02] Checkpoint saved at step 101500
+[2026-01-27 04:54:10] 
+==================================================
+[2026-01-27 04:54:10] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:54:10] DIFF:
+FILE: conftest.py
+@@ -5,7 +5,8 @@ def pytest_ignore_collect(path):
+     path = str(path)
+     if 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path:
+         return True
+-    if platform.python_version_tuple()[0:2] < ('3', '6'):
++    ver_tup = platform.python_version_tuple()[0:2]
++    if ver_tup < ('3', '6') or ver_tup >= ('3', '9'):
+         if 'numba' in path:
+             return True
+     if sys.version[0] == '2':
+[2026-01-27 04:54:10] 
+ACTUAL MESSAGE: Github Actions attempt 6 disable numba on
+[2026-01-27 04:54:10] GENERATED MESSAGE: Add support for python versions greater than 3
+[2026-01-27 04:54:10] ==================================================
+
+[2026-01-27 04:54:14] Checkpoint saved at step 102000
+[2026-01-27 04:57:21] 
+==================================================
+[2026-01-27 04:57:21] TEST ON RANDOM VAL DIFF:
+[2026-01-27 04:57:21] DIFF:
+FILE: index.js
+@@ -87,9 +87,9 @@ module.exports = {
+       // validate that fixtures has been loaded into data
+       if (Object.keys(data).length > 0) {
+         doPopulateSails(done);
+-      } else {
+-        done(new Error("No fixtures loaded"));
+       }
++      else
++        done();
+     }
+   }
+ };
+[2026-01-27 04:57:21] 
+ACTUAL MESSAGE: remove throwing error if no fixtures presented
+[2026-01-27 04:57:21] GENERATED MESSAGE: fix(index): don't populate fixtures if no fixtures are loaded
+[2026-01-27 04:57:21] ==================================================
+
+[2026-01-27 04:57:26] Checkpoint saved at step 102500
+[2026-01-27 05:00:35] 
+==================================================
+[2026-01-27 05:00:35] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:00:35] DIFF:
+FILE: commands/command_prune.go
+@@ -156,21 +156,21 @@ func prune(verifyRemote, dryRun, verbose bool) {
+ 		progresswait.Wait()
+ 	}
++	if len(prunableObjects) == 0 {
++		Print("Nothing to prune")
++		return
++	}
+ 	if dryRun {
+ 		Print("%d files would be pruned (%v)", len(prunableObjects), humanizeBytes(totalSize))
+ 		if verbose {
+ 			Print(verboseOutput.String())
+ 		}
+ 	} else {
+-		if len(prunableObjects) == 0 {
+-			Print("Nothing to prune")
+-		} else {
+-			Print("Pruning %d files, (%v)", len(prunableObjects), humanizeBytes(totalSize))
+-			if verbose {
+-				Print(verboseOutput.String())
+-			}
+-			pruneDeleteFiles(prunableObjects)
++		Print("Pruning %d files, (%v)", len(prunableObjects), humanizeBytes(totalSize))
++		if verbose {
++			Print(verboseOutput.String())
+ 		}
++		pruneDeleteFiles(prunableObjects)
+ 	}
+ }
+[2026-01-27 05:00:35] 
+ACTUAL MESSAGE: Use "Nothing to prune" message in dry run mode too
+[2026-01-27 05:00:35] GENERATED MESSAGE: commands: fix prunability prunes (#)
+[2026-01-27 05:00:35] ==================================================
+
+[2026-01-27 05:00:40] Checkpoint saved at step 103000
+[2026-01-27 05:03:50] 
+==================================================
+[2026-01-27 05:03:50] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:03:50] DIFF:
+FILE: src/org/parosproxy/paros/common/ThreadPool.java
+@@ -18,15 +18,22 @@
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+  */
++// ZAP: 2014/04/01 Changed to allow to set a name to created threads.
+ package org.parosproxy.paros.common;
+ public class ThreadPool {
+ 	private Thread[]	pool		= null;
++	private final String threadsBaseName;
+ 	public ThreadPool(int maxThreadCount) {
++		this(maxThreadCount, null);
++	}
++
++	public ThreadPool(int maxThreadCount, String threadsBaseName) {
+ 		pool = new Thread[maxThreadCount];
++		this.threadsBaseName = threadsBaseName;
+ 	}
+ 	/**
+@@ -37,6 +44,9 @@ public class ThreadPool {
+ 		for (int i=0; i<pool.length; i++) {
+ 			if (pool[i] == null || !pool[i].isAlive()) {
+ 				pool[i] = new Thread(runnable);
++				if (threadsBaseName != null) {
++					pool[i].setName(threadsBaseName + i);
++				}
+ 				pool[i].setDaemon(true);
+ 				pool[i].start();
+ 				return pool[i];
+[2026-01-27 05:03:50] 
+ACTUAL MESSAGE: Changed ThreadPool to allow to set a name to created threads.
+[2026-01-27 05:03:50] GENERATED MESSAGE: Added a threadPool constructor to thread pool.
+[2026-01-27 05:03:50] ==================================================
+
+[2026-01-27 05:03:55] Checkpoint saved at step 103500
+[2026-01-27 05:07:03] 
+==================================================
+[2026-01-27 05:07:03] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:07:03] DIFF:
+FILE: library/src/main/java/com/mikepenz/materialdrawer/model/ProfileSettingDrawerItem.java
+@@ -294,7 +294,7 @@ public class ProfileSettingDrawerItem implements IDrawerItem, IProfile<ProfileSe
+     @Override
+     public String getType() {
+-        return "PROFILE_SETTING2_ITEM";
++        return "PROFILE_SETTING_ITEM";
+     }
+     @Override
+[2026-01-27 05:07:03] 
+ACTUAL MESSAGE: * fix typo in type for profile setting item
+[2026-01-27 05:07:03] GENERATED MESSAGE: Fixed wrong type for profile setting
+[2026-01-27 05:07:03] ==================================================
+
+[2026-01-27 05:07:07] Checkpoint saved at step 104000
+[2026-01-27 05:10:15] 
+==================================================
+[2026-01-27 05:10:15] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:10:15] DIFF:
+FILE: tests/implemented.py
+@@ -23,6 +23,7 @@ PREFIXES = {
+ SOLVED_KEYWORDS = [
+ 	"Windfury", "Charge", "Divine Shield", "Taunt", "Stealth",
+ 	"Can't be targeted by spells or Hero Powers",
++	"Destroy any minion damaged by this minion.",
+ 	"50% chance to attack the wrong enemy",
+ 	"Can't Attack",
+ 	r"Spell Damage \+\d+",
+[2026-01-27 05:10:15] 
+ACTUAL MESSAGE: implemented.py: Check for POISONOUS as well
+[2026-01-27 05:10:15] GENERATED MESSAGE: Add test for destroyable minions
+[2026-01-27 05:10:15] ==================================================
+
+[2026-01-27 05:10:20] Checkpoint saved at step 104500
+[2026-01-27 05:13:26] 
+==================================================
+[2026-01-27 05:13:26] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:13:26] DIFF:
+FILE: core/src/main/java/com/google/bitcoin/discovery/IrcDiscovery.java
+@@ -93,7 +93,7 @@ public class IrcDiscovery implements PeerDiscovery {
+         ArrayList<InetSocketAddress> addresses = new ArrayList<InetSocketAddress>();
+         connection = null;
+         try {
+-            InetAddress ip = InetAddress.getByName("irc.lfnet.org");
++            InetAddress ip = InetAddress.getByName(server);
+             log.info("Connecting to IRC with " + ip);
+             connection = new Socket(server, port);
+             writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+[2026-01-27 05:13:26] 
+ACTUAL MESSAGE: Actually use the provided IRC server name in IrcDiscovery. Resolves issue .
+[2026-01-27 05:13:26] GENERATED MESSAGE: Use server instead of ip for IRC discovery.
+[2026-01-27 05:13:26] ==================================================
+
+[2026-01-27 05:13:31] Checkpoint saved at step 105000
+[2026-01-27 05:16:38] 
+==================================================
+[2026-01-27 05:16:38] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:16:38] DIFF:
+FILE: spec/dummy/app/admin/invoices.rb
+@@ -1,19 +1,38 @@
+ ActiveAdmin.register Invoice do
+-  permit_params :legal_date, :number, :paid
++  permit_params :legal_date, :number, :paid, :state, :attachment, :photo
+   index do
+     selectable_column
+     id_column
++    tag_column :state
+     bool_column :paid
++    image_column :photo, style: :thumb
++    attachment_column :attachment
++    column :legal_date
++    number_column :number, as: :currency, unit: "$", separator: ","
+     actions
+   end
+   show do
+     attributes_table do
+       row :id
+-      row :legal_date
+-      row :number
++      tag_row :state
+       bool_row :paid
++      image_row("Mi foto", :photo, style: :big, &:photo)
++      attachment_row("Mi documento", :attachment, truncate: false, &:attachment)
++      row :legal_date
++      number_row("Número", :number, as: :human, &:number)
++    end
++  end
++
++  form do |f|
++    f.inputs "Details" do
++      f.input :state
++      f.input :paid
++      f.input :number
++      f.input :attachment
++      f.input :photo
+     end
++    f.actions
+   end
+ end
+[2026-01-27 05:16:38] 
+ACTUAL MESSAGE: feat(): add invoices page example
+[2026-01-27 05:16:38] GENERATED MESSAGE: Add state and photo attachments to invoice
+[2026-01-27 05:16:38] ==================================================
+
+[2026-01-27 05:16:42] Checkpoint saved at step 105500
+[2026-01-27 05:19:51] 
+==================================================
+[2026-01-27 05:19:51] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:19:51] DIFF:
+FILE: packages/ember-application/lib/system/application.js
+@@ -144,9 +144,8 @@ export function _resetLegacyAddonWarnings() {
+   not receive events.* If you specify a custom root element, make sure you only
+   append views inside it!
+-  To learn more about the advantages of event delegation and the Ember view
+-  layer, and a list of the event listeners that are setup by default, visit the
+-  [Ember View Layer guide](
++  To learn more about the events Ember components use, see
++  [components/handling-events](
+   ### Initializers
+[2026-01-27 05:19:51] 
+ACTUAL MESSAGE: [DOC release] fixed broken url in docs
+[2026-01-27 05:19:51] GENERATED MESSAGE: [DOC release] Fix typo (#)
+[2026-01-27 05:19:51] ==================================================
+
+[2026-01-27 05:19:56] Checkpoint saved at step 106000
+[2026-01-27 05:23:04] 
+==================================================
+[2026-01-27 05:23:04] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:23:04] DIFF:
+FILE: command/format.go
+@@ -75,7 +75,6 @@ func Format(ui cli.Ui) string {
+ 		return ui.(*VaultUI).format
+ 	}
+-	panic("")
+ 	format := os.Getenv(EnvVaultFormat)
+ 	if format == "" {
+ 		format = "table"
+[2026-01-27 05:23:04] 
+ACTUAL MESSAGE: fix tests (#)
+[2026-01-27 05:23:04] GENERATED MESSAGE: command: fix panic when format is nil
+[2026-01-27 05:23:04] ==================================================
+
+[2026-01-27 05:23:09] Checkpoint saved at step 106500
+[2026-01-27 05:26:16] 
+==================================================
+[2026-01-27 05:26:16] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:26:16] DIFF:
+FILE: src/main/resources/META-INF/resources/primefaces/datatable/datatable.js
+@@ -1469,6 +1469,10 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
+                         widget: $this,
+                         handle: function(content) {
+                             this.updateData(content);
++                            
++                            if(this.checkAllToggler) {
++                              this.updateHeaderCheckbox();
++                            }
+                         }
+                     });
+[2026-01-27 05:26:16] 
+ACTUAL MESSAGE: Fix for # Datatable - sorting doesn't update header checkbox when checkAllToggler used
+[2026-01-27 05:26:16] GENERATED MESSAGE: Check all togglers before updating data table.
+[2026-01-27 05:26:16] ==================================================
+
+[2026-01-27 05:26:21] Checkpoint saved at step 107000
+[2026-01-27 05:29:30] 
+==================================================
+[2026-01-27 05:29:30] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:29:30] DIFF:
+FILE: src/collection-style.js
+@@ -64,7 +64,9 @@
+       if( $$.is.plainObject(name) ){ // then extend the bypass
+         var props = name;
+         style.applyBypass( this, props );
+-        this.rtrigger('style'); // let the renderer know we've updated style
++
++        var updatedCompounds = this.updateCompoundBounds();
++        this.add( updatedCompounds ).rtrigger('style'); // let the renderer know we've updated style
+       } else if( $$.is.string(name) ){
+@@ -79,7 +81,9 @@
+         } else { // then set the bypass with the property value
+           style.applyBypass( this, name, value );
+-          this.rtrigger('style'); // let the renderer know we've updated style
++
++          var updatedCompounds = this.updateCompoundBounds();
++        	this.add( updatedCompounds ).rtrigger('style'); // let the renderer know we've updated style
+         }
+       } else if( name === undefined ){
+@@ -105,7 +109,8 @@
+         style.removeAllBypasses( ele );
+       }
+-      this.rtrigger('style');
++      var updatedCompounds = this.updateCompoundBounds();
++      this.add( updatedCompounds ).rtrigger('style');
+     },
+     show: function(){
+[2026-01-27 05:29:30] 
+ACTUAL MESSAGE: add # fix to . branch
+[2026-01-27 05:29:30] GENERATED MESSAGE: refactor(style): add rtrigger() method
+[2026-01-27 05:29:30] ==================================================
+
+[2026-01-27 05:29:35] Checkpoint saved at step 107500
+[2026-01-27 05:32:40] 
+==================================================
+[2026-01-27 05:32:40] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:32:40] DIFF:
+FILE: src/Provider/ApiServiceProvider.php
+@@ -13,13 +13,22 @@ use Dingo\Api\Transformer\Factory as TransformerFactory;
+ class ApiServiceProvider extends ServiceProvider
+ {
+     /**
++     * Boot the service provider.
++     *
++     * @return void
++     */
++    public function boot()
++    {
++        $this->setupConfig();
++    }
++
++    /**
+      * Register the service provider.
+      *
+      * @return void
+      */
+     public function register()
+     {
+-        $this->setupConfig();
+         $this->setupClassAliases();
+         $this->registerExceptionHandler();
+@@ -42,7 +51,11 @@ class ApiServiceProvider extends ServiceProvider
+      */
+     protected function setupConfig()
+     {
+-        $this->mergeConfigFrom(__DIR__.'/../../config/api.php', 'api');
++        $source = realpath(__DIR__.'/../../config/api.php');
++
++        $this->publishes([$source => config_path('api.php')]);
++
++        $this->mergeConfigFrom($source, 'api');
+     }
+     /**
+[2026-01-27 05:32:40] 
+ACTUAL MESSAGE: Move setup config to boot method
+Also added publish method to move the config file to /config folder in a Laravel project.
+[2026-01-27 05:32:40] GENERATED MESSAGE: Added boot method to api provider
+[2026-01-27 05:32:40] ==================================================
+
+[2026-01-27 05:32:45] Checkpoint saved at step 108000
+[2026-01-27 05:35:56] 
+==================================================
+[2026-01-27 05:35:56] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:35:56] DIFF:
+FILE: src/Runtime/PhpFpm.php
+@@ -113,9 +113,10 @@ class PhpFpm
+         [$requestHeaders, $requestBody] = $this->eventToFastCgiRequest($event);
+         $responder = new Responder($this->client);
+         $context = $event['requestContext'] ?? [];
+-        $isALB = array_key_exists('elb', $context);
+-        if (method_exists($responder, 'setMultiHeader')) {
+-            $responder->setMultiHeader($isALB);
++        // If is coming from ALB/ELB or has MultiHeaders we Enable it.
++        $isALB = array_key_exists('elb', $context) || (array_key_exists('multiValueHeaders', $event));
++        if (method_exists($responder, 'enableMultiHeaders')) {
++            $responder->enableMultiHeaders($isALB);
+         }
+         try {
+             $responder->send($requestHeaders, $requestBody);
+[2026-01-27 05:35:56] 
+ACTUAL MESSAGE: Changing code to Hoa's new MultiHeader Code
+[2026-01-27 05:35:56] GENERATED MESSAGE: Enable multi-header in fastcgi request
+[2026-01-27 05:35:56] ==================================================
+
+[2026-01-27 05:36:01] Checkpoint saved at step 108500
+[2026-01-27 05:39:11] 
+==================================================
+[2026-01-27 05:39:11] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:39:11] DIFF:
+FILE: reference/cwltool/workflow.py
+@@ -159,6 +159,9 @@ class Workflow(Process):
+         if inputobj is None:
+             return
++        if step.submitted:
++            return
++
+         _logger.info("Creating job with input: %s", pprint.pformat(inputobj))
+         callback = functools.partial(self.receive_output, step, outputparms)
+@@ -179,6 +182,8 @@ class Workflow(Process):
+         else:
+             jobs = step.job(inputobj, basedir, callback, **kwargs)
++        step.submitted = True
++
+         for j in jobs:
+             yield j
+@@ -205,6 +210,7 @@ class Workflow(Process):
+         for s in self.steps:
+             for out in s.tool["outputs"]:
+                 self.state[out["id"]] = None
++            s.submitted = False
+             s.completed = False
+         if "outdir" in kwargs:
+[2026-01-27 05:39:11] 
+ACTUAL MESSAGE: Fix workflows not to submit the same step over and over.
+[2026-01-27 05:39:11] GENERATED MESSAGE: Workflow: set submitted flag to True when creating job
+[2026-01-27 05:39:11] ==================================================
+
+[2026-01-27 05:39:15] Checkpoint saved at step 109000
+[2026-01-27 05:42:21] 
+==================================================
+[2026-01-27 05:42:21] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:42:21] DIFF:
+FILE: src/phpFastCache/Drivers/Mongodb/Driver.php
+@@ -30,6 +30,7 @@ use Psr\Cache\CacheItemInterface;
+ /**
+  * Class Driver
+  * @package phpFastCache\Drivers
++ * @property MongodbClient $instance Instance of driver service
+  */
+ class Driver extends DriverAbstract
+ {
+[2026-01-27 05:42:21] 
+ACTUAL MESSAGE: Added @property annotation on MongoDb driver
+[2026-01-27 05:42:21] GENERATED MESSAGE: Added property to MongoDB driver
+[2026-01-27 05:42:21] ==================================================
+
+[2026-01-27 05:42:25] Checkpoint saved at step 109500
+[2026-01-27 05:45:35] 
+==================================================
+[2026-01-27 05:45:35] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:45:35] DIFF:
+FILE: resources/views/tools/database/index.blade.php
+@@ -46,16 +46,16 @@
+                                 </a>
+                                 <a href="{{ route('voyager.bread.edit', $table->name) }}"
+                                    class="btn-sm btn-default edit">
+-                                   {{ __('voyager.database.edit_bread') }}
++                                   {{ __('voyager.bread.edit_bread') }}
+                                 </a>
+                                 <div data-id="{{ $table->dataTypeId }}" data-name="{{ $table->name }}"
+                                      class="btn-sm btn-danger delete" style="display:inline">
+-                                     {{ __('voyager.database.delete_bread') }}
++                                     {{ __('voyager.bread.delete_bread') }}
+                                 </div>
+                             @else
+                                 <a href="{{ route('voyager.bread.create', ['name' => $table->name]) }}"
+                                    class="btn-sm btn-default">
+-                                    <i class="voyager-plus"></i> {{ __('voyager.database.add_bread') }}
++                                    <i class="voyager-plus"></i> {{ __('voyager.bread.add_bread') }}
+                                 </a>
+                             @endif
+                             </div>
+[2026-01-27 05:45:35] 
+ACTUAL MESSAGE: fix wrong locale variable on database index view (#)
+[2026-01-27 05:45:35] GENERATED MESSAGE: 
+[2026-01-27 05:45:35] ==================================================
+
+[2026-01-27 05:45:39] Checkpoint saved at step 110000
+[2026-01-27 05:48:48] 
+==================================================
+[2026-01-27 05:48:48] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:48:48] DIFF:
+FILE: citrination_client/client.py
+@@ -55,6 +55,17 @@ class CitrinationClient(object):
+             raise RuntimeError('Received ' + str(response.status_code) + ' response: ' + str(response.reason))
+         return PifSearchResult(**keys_to_snake_case(response.json()['results']))
++    def predict(self, model_name, candidates):
++        url = self._get_predict_url(model_name)
++        body = pif.dumps({"predictionSource": "scalar", "usePrior": True, "candidates": candidates})
++        print("Posting to {} with data={}".format(url, body))
++        response = requests.post(url, data=body, headers=self.headers)
++        return response
++
++    def _get_predict_url(self, model_name):
++        return self.api_url + '/csv_to_models/' + model_name + '/predict'
++
++
+     def upload_file(self, file_path, data_set_id, root_path=None):
+         """
+         Upload file to Citrination.
+[2026-01-27 05:48:48] 
+ACTUAL MESSAGE: Adding predict call; still debugging
+[2026-01-27 05:48:48] GENERATED MESSAGE: Add predict method to client
+[2026-01-27 05:48:48] ==================================================
+
+[2026-01-27 05:48:52] Checkpoint saved at step 110500
+[2026-01-27 05:52:03] 
+==================================================
+[2026-01-27 05:52:03] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:52:03] DIFF:
+FILE: core/server/services/members/importer/index.js
+@@ -247,17 +247,6 @@ function getMemberData({members, allLabelModels, importSetLabels, createdBy}) {
+         let createdAt = member.created_at === '' ? undefined : member.created_at;
+         if (createdAt) {
+-            const date = new Date(createdAt);
+-
+-            // CASE: client sends `0000-00-00 00:00:00`
+-            if (isNaN(date)) {
+-                // TODO: throw in validation stage for single record, not whole batch!
+-                throw new errors.ValidationError({
+-                    message: i18n.t('errors.models.base.invalidDate', {key: 'created_at'}),
+-                    code: 'DATE_INVALID'
+-                });
+-            }
+-
+             createdAt = moment(createdAt).toDate();
+         } else {
+             createdAt = new Date();
+[2026-01-27 05:52:03] 
+ACTUAL MESSAGE: Removed date handling validation in members importer logic
+no issue
+- This is handled on input sanitization layer with date
+format check in JSON schema validation, so there's no need to do this
+check again in the importer.
+[2026-01-27 05:52:03] GENERATED MESSAGE: refactor(importers): remove NaN validation error (#)
+[2026-01-27 05:52:03] ==================================================
+
+[2026-01-27 05:52:07] Checkpoint saved at step 111000
+[2026-01-27 05:55:16] 
+==================================================
+[2026-01-27 05:55:16] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:55:16] DIFF:
+FILE: tests/test_enrich.py
+@@ -116,7 +116,7 @@ class TestEnrich(unittest.TestCase):
+         file_1['filepath'] = 'file.txt'
+         file_1['file_name'] = 'file.txt'
+         file_1['file_ext'] = 'txt'
+-        file_1['file_dir_name'] = ''
++        file_1['file_dir_name'] = '/'
+         file_1['file_path_list'] = ['file.txt']
+         file_2['filepath'] = '/foo/bar'
+         file_2['file_name'] = 'bar'
+[2026-01-27 05:55:16] 
+ACTUAL MESSAGE: [tests] Update FilePath test code
+This code updates the test code of the FilePath class according
+to the change introduced in bdd1
+[2026-01-27 05:55:16] GENERATED MESSAGE: Ensure file dir name is a string.
+[2026-01-27 05:55:16] ==================================================
+
+[2026-01-27 05:55:20] Checkpoint saved at step 111500
+[2026-01-27 05:58:29] 
+==================================================
+[2026-01-27 05:58:29] TEST ON RANDOM VAL DIFF:
+[2026-01-27 05:58:29] DIFF:
+FILE: spec/test_helper.rb
+@@ -13,3 +13,7 @@ def build_mirror(options = {})
+ end
+ include Braid::Operations::VersionControl
++
++RSpec.configure do |config|
++  config.mock_with :mocha
++end
+[2026-01-27 05:58:29] 
+ACTUAL MESSAGE: Ensure RSpec resets mocks each run
+[2026-01-27 05:58:29] GENERATED MESSAGE: Add mock for ruby  compatibility
+[2026-01-27 05:58:29] ==================================================
+
+[2026-01-27 05:58:34] Checkpoint saved at step 112000
+[2026-01-27 06:01:44] 
+==================================================
+[2026-01-27 06:01:44] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:01:44] DIFF:
+FILE: imageresize/imageresize.py
+@@ -1,8 +1,10 @@
++
+ from __future__ import division
+ from PIL import Image
+ import imageexceptions
+ import math
++
+ def resize_crop(image, size):
+     """
+     Crop the image with a centered rectangle of the specified size
+@@ -13,10 +15,14 @@ def resize_crop(image, size):
+     image = image.copy()
+     old_size = image.size
+     if old_size[0] >= size[0] and old_size[1] >= size[1]:
+-        left = int(math.ceil((old_size[0] - size[0])/2))
+-        top = int(math.ceil((old_size[1] - size[1])/2))
+-        right = int(math.ceil(old_size[0] - left))
+-        bottom = int(math.ceil(old_size[1] - top))
++        left = (old_size[0] - size[0])/2
++        top = (old_size[1] - size[1])/2
++        right = old_size[0] - left
++        bottom = old_size[1] - top
++        left, top, right, bottom = map(
++            lambda x: int(math.ceil(x)),
++            (left, top, right, bottom)
++        )
+         crop = image.crop((left, top, right, bottom))
+         crop.format = img_format
+         return crop
+[2026-01-27 06:01:44] 
+ACTUAL MESSAGE: imageresize: fix rounding issue in resize_crop
+[2026-01-27 06:01:44] GENERATED MESSAGE: ImageResize: fixed bug in image resize.
+[2026-01-27 06:01:44] ==================================================
+
+[2026-01-27 06:01:48] Checkpoint saved at step 112500
+[2026-01-27 06:04:56] 
+==================================================
+[2026-01-27 06:04:56] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:04:56] DIFF:
+FILE: src/util/methodDataByVersion/4.js
+@@ -24,6 +24,7 @@ module.exports = {
+         valueOf: 'value'
+     },
+     shorthand: [
++        'countBy',
+         'differenceBy',
+         'dropRightWhile',
+         'dropWhile',
+@@ -34,6 +35,7 @@ module.exports = {
+         'findKey',
+         'findLastIndex',
+         'findLastKey',
++        'flatMap',
+         'flatMapDeep',
+         'flatMapDepth',
+         'groupBy',
+@@ -43,14 +45,18 @@ module.exports = {
+         'mapValues',
+         'maxBy',
+         'minBy',
++        'omitBy',
+         'overSome',
+         'overEvery',
+         'partition',
++        'pickBy',
++        'pullAllBy',
+         'reject',
+         'remove',
+         'some',
+         'sortedIndexBy',
+         'sortedLastIndexBy',
++        'sortedUniqBy',
+         'sumBy',
+         'takeRightWhile',
+         'takeWhile',
+[2026-01-27 06:04:56] 
+ACTUAL MESSAGE: add missing shorthand functions to version 4
+[2026-01-27 06:04:56] GENERATED MESSAGE: Add flatMap and pullAllTo methods
+[2026-01-27 06:04:56] ==================================================
+
+[2026-01-27 06:05:01] Checkpoint saved at step 113000
+[2026-01-27 06:08:08] 
+==================================================
+[2026-01-27 06:08:08] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:08:08] DIFF:
+FILE: go/vt/worker/clone_utils.go
+@@ -98,3 +98,28 @@ func makeValueString(fields []*querypb.Field, rows [][]sqltypes.Value) string {
+ 	}
+ 	return buf.String()
+ }
++
++// escape adds surrounding backticks (`) to an MySQL identifier.
++// This is required for identifiers which are reserved words e.g. "CREATE".
++func escape(identifier string) string {
++	b := bytes.Buffer{}
++	writeEscaped(&b, identifier)
++	return b.String()
++}
++
++// escapeAll runs escape() for all entries in the slice.
++func escapeAll(identifiers []string) []string {
++	result := make([]string, len(identifiers))
++	for i := range identifiers {
++		result[i] = escape(identifiers[i])
++	}
++	return result
++}
++
++// writeEscaped escapes the SQL "identifier" before writing it to "b".
++// See also escape().
++func writeEscaped(b *bytes.Buffer, identifier string) {
++	b.WriteByte('`')
++	b.WriteString(identifier)
++	b.WriteByte('`')
++}
+[2026-01-27 06:08:08] 
+ACTUAL MESSAGE: worker: Add helper functions to escape SQL identifiers.
+Without escaping, reserved words cannot be used in the generated queries e.g. "CREATE" as table name.
+[2026-01-27 06:08:08] GENERATED MESSAGE: worker: add helper function for escaping identifiers
+[2026-01-27 06:08:08] ==================================================
+
+[2026-01-27 06:08:13] Checkpoint saved at step 113500
+[2026-01-27 06:11:19] 
+==================================================
+[2026-01-27 06:11:19] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:11:19] DIFF:
+FILE: cmd.js
+@@ -20,7 +20,8 @@ const defaultBanner = `
+ if (module.parent === null) {
+   cmd(process.argv.slice(2)).catch((err) => {
+-    console.error(hasUnicode ? `\n🚫  ${err.message}` : `\n${err.message}`)
++    err.message = hasUnicode ? `\n🚫  ${err.message}` : `\n${err.message}`
++    console.error(err)
+     debug(err)
+     process.exit(err.code || 1)
+   })
+[2026-01-27 06:11:19] 
+ACTUAL MESSAGE: Log the actual error and not only the message
+In case of an error, it is hard to debug anything without the actual
+stack trace and further information that might be attached to the
+error. This is fixed by changing the message and then logging the
+actual error.
+[2026-01-27 06:11:19] GENERATED MESSAGE: fix(cmd): fix typo in error message (#)
+[2026-01-27 06:11:19] ==================================================
+
+[2026-01-27 06:11:24] Checkpoint saved at step 114000
+[2026-01-27 06:14:31] 
+==================================================
+[2026-01-27 06:14:31] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:14:31] DIFF:
+FILE: experiments/utils.py
+@@ -15,11 +15,11 @@ BOT_REGEX = re.compile("(Baidu|Gigabot|Googlebot|YandexBot|AhrefsBot|TVersity|li
+ def record_goal(request, goal_name):
+-    warnings.warn('experiments.utils.record_goal is deprecated. Please use participant().goal() instead.', DeprecationWarning)
+     _record_goal(goal_name, request)
+ def _record_goal(goal_name, request=None, session=None, user=None):
++    warnings.warn('record_goal is deprecated. Please use participant().goal() instead.', DeprecationWarning)
+     experiment_user = participant(request, session, user)
+     experiment_user.goal(goal_name)
+[2026-01-27 06:14:31] 
+ACTUAL MESSAGE: Obsolete all forms of record_goal
+[2026-01-27 06:14:31] GENERATED MESSAGE: Fix deprecations warning in utils (#)
+[2026-01-27 06:14:31] ==================================================
+
+[2026-01-27 06:14:36] Checkpoint saved at step 114500
+[2026-01-27 06:17:40] 
+==================================================
+[2026-01-27 06:17:40] TEST ON RANDOM VAL DIFF:
+[2026-01-27 06:17:40] DIFF:
+FILE: setup.py
+@@ -55,6 +55,10 @@ from setuptools.command.test import test as _test
+ scripts = []
+ console_scripts = ["easy_install = setuptools.command.easy_install:main"]
++
++# Gentoo distributions manage the python-version-specific scripts themselves,
++# so they define an environment variable to suppress the creation of the
++# version-specific scripts.
+ if os.environ.get("SETUPTOOLS_DISABLE_VERSIONED_EASY_INSTALL_SCRIPT") in (None, "", "0") and \
+     os.environ.get("DISTRIBUTE_DISABLE_VERSIONED_EASY_INSTALL_SCRIPT") in (None, "", "0"):
+     console_scripts.append("easy_install-%s = setuptools.command.easy_install:main" % sys.version[:3])
+[2026-01-27 06:17:40] 
+ACTUAL MESSAGE: Add comment to capture the purpose of the environment variable
+[2026-01-27 06:17:40] GENERATED MESSAGE: setup: suppress version specific scripts in setup script
+This is necessary in order to ensure that we don't create a
+distribution that doesn't have the same python version as the one we're
+[2026-01-27 06:17:40] ==================================================
+
+[2026-01-27 06:17:45] Checkpoint saved at step 115000
+[2026-01-27 06:28:17] Summary Epoch 5: Train Loss: 1.3278| Train Accuracy: 0.7318        | Val Loss: 1.3772| Val Accuracy: 0.7295)| PPL: 3.9640
+[2026-01-27 06:28:19] >>> New best model saved!

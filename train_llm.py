@@ -171,10 +171,8 @@ def generate(model, tokenizer, device,val_df):
     model.train()
 
 # --- 2. Training Step ---
-def train_one_epoch(model, dataloader, optimizer,scaler, device, progress_bar, tokenizer,scheduler,val_df,start_epoch,epoch,global_step,best_val_loss,bad_epochs):
+def train_one_epoch(model, dataloader, optimizer,scaler, device, progress_bar, tokenizer,scheduler,val_df,start_epoch,epoch,global_step,best_val_loss,bad_epochs,total_loss,total_acc):
     model.train()
-    total_loss = 0
-    total_acc = 0
     steps_to_skip = global_step % len(dataloader)
     if epoch == start_epoch and steps_to_skip > 0:
         progress_bar.update(steps_to_skip) 
@@ -187,18 +185,19 @@ def train_one_epoch(model, dataloader, optimizer,scaler, device, progress_bar, t
         y = y.to(device)
 
         optimizer.zero_grad()
-
+        with torch.autocast(device_type='cuda', dtype=torch.float16, enabled=True):
         # Forward pass
-        logits = model(x).logits
-        loss = nn.CrossEntropyLoss()(
+            logits = model(x).logits
+            loss = nn.CrossEntropyLoss()(
             logits.view(-1, logits.size(-1)),
             y.view(-1)
-        )
+            )
         acc = calculate_accuracy(logits, y)
      #  loss.backward()
         scaler.scale(loss).backward()
 
         #optimizer.step()
+        
         scaler.step(optimizer)
         scaler.update()
         scheduler.step()
@@ -220,7 +219,9 @@ def train_one_epoch(model, dataloader, optimizer,scaler, device, progress_bar, t
                     'scheduler_state_dict': scheduler.state_dict(),
                     'scaler_state_dict': scaler.state_dict(),
                     'best_val_loss': best_val_loss,
-                    'bad_epochs': bad_epochs
+                    'bad_epochs': bad_epochs,
+                    'total_acc': total_acc,
+                    'total_loss':total_loss
                 }
             torch.save(checkpoint, "latest_checkpoint.pt")
             log_text(f"Checkpoint saved at step {global_step}")
@@ -240,12 +241,12 @@ def evaluate(model, dataloader, device,progress_bar):
         for i,(x, y) in enumerate(dataloader):
             x = x.to(device)
             y = y.to(device)
-
-            logits = model(x).logits
-            loss = nn.CrossEntropyLoss()(
-                logits.view(-1, logits.size(-1)),
-                y.view(-1)
-            )
+            with torch.autocast(device_type='cuda', dtype=torch.float16, enabled=True):
+                logits = model(x).logits
+                loss = nn.CrossEntropyLoss()(
+                    logits.view(-1, logits.size(-1)),
+                    y.view(-1)
+                )
             total_loss += loss.item()
             val_acc = calculate_accuracy(logits, y)
             total_acc  += val_acc
@@ -263,6 +264,8 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
     best_val_loss = float("inf")
     patience = 2
     bad_epochs = 0
+    total_loss = 0
+    total_acc = 0
     checkpoint_path = "latest_checkpoint.pt"
     start_epoch = 0
     global_step = 0
@@ -275,6 +278,8 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
 
         best_val_loss = checkpoint.get('best_val_loss', float("inf"))
         bad_epochs = checkpoint.get('bad_epochs', 0)
+        total_acc = checkpoint.get('total_loss', 0)
+        total_loss = checkpoint.get('total_acc', 0)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
@@ -285,7 +290,8 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
         log_text(f"Resuming from Epoch {start_epoch+1}, Global Step {global_step}")
         log_text(f"Resuming with Best Val Loss = {best_val_loss:.4f}")
         log_text(f"Resuming with number of bad epochs = {bad_epochs:.4f}")
-
+        log_text(f"Resuming with total_loss = {total_loss:.4f}")
+        log_text(f"Resuming with total_acc = {total_loss:.4f}")
 
     for epoch in range(start_epoch,epochs):
 
@@ -311,7 +317,9 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
                                                           epoch,
                                                           global_step,
                                                           best_val_loss,
-                                                          bad_epochs
+                                                          bad_epochs,
+                                                          total_loss,
+                                                          total_acc
                                                           )
 
         # Evaluate
@@ -319,6 +327,7 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
                                     val_loader, 
                                     device,
                                     progress_bar)
+        total_loss,total_acc = 0,0
         try:
             ppl = math.exp(val_loss)
         except OverflowError:

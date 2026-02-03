@@ -15,16 +15,14 @@ import torch.nn as nn
 
 
 def clean_text(text):
-# 1. Αφαίρεση της γραμμής index (είτε έχει πραγματικό hash είτε το λεκτικό <HASH>)
-    # Χρησιμοποιούμε το .* για να πιάσουμε τα πάντα μέχρι την αλλαγή γραμμής
+# 1. Αφαίρεση της γραμμής index 
     text = re.sub(r'^index .*\n', '', text, flags=re.MULTILINE)
     
     # 2. Απλοποίηση του 'diff --git' σε 'FILE:'
-    # Κρατάμε μόνο το όνομα του αρχείου. Είναι το πιο σημαντικό context!
+
     text = re.sub(r'^diff --git a/(.*) b/(.*)\n', r'FILE: \1\n', text, flags=re.MULTILINE)
     
     # 3. Αφαίρεση των γραμμών --- a/ και +++ b/ 
-    # Αφού έχουμε το FILE:, αυτές οι γραμμές είναι 100% περιττές.
     text = re.sub(r'^--- a/.*\n', '', text, flags=re.MULTILINE)
     text = re.sub(r'^\+\+\+ b/.*\n', '', text, flags=re.MULTILINE)
 
@@ -33,11 +31,9 @@ def clean_text(text):
     text = re.sub(r'\n\s*\n', '\n', text)
 
     # 1. Αφαίρεση metadata (Signed-off-by, Co-authored-by, κλπ)
-    # Αυτά καταστρέφουν το training γιατί το μοντέλο μαθαίνει ονόματα αντί για κώδικα
     text = re.sub(r'^(Signed-off-by|Co-authored-by|Reported-by|Reviewed-by|Cc):.*$', '', text, flags=re.MULTILINE)
     
-    # 2. Αφαίρεση links προς Issues ή Pull Requests (π.χ. https://github.com...)
-    # Τα URL είναι τεράστια σε tokens και δεν προσφέρουν νόημα στο GPT-2
+    # 2. Αφαίρεση links 
     text = re.sub(r'https?://\S+', '', text, flags=re.MULTILINE)
     
     # 3. Αφαίρεση των placeholders <HASH> ή <I> αν υπάρχουν μόνα τους
@@ -126,7 +122,6 @@ def calculate_accuracy(logits, labels,ignore_index = -100):
     return accuracy.item()
 
 def get_random_validation_diff(val_df):
-    # Διαλέγουμε μια τυχαία γραμμή από το validation dataframe
     random_row = val_df.sample(n=1).iloc[0]
     return random_row['diff'], random_row['message']
 
@@ -158,7 +153,6 @@ def generate(model, tokenizer, device,val_df):
             eos_token_id=tokenizer.eos_token_id
         )
 
-    # Αποκωδικοποίηση μόνο της απάντησης
     full_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     generated_message = full_text.split("COMMIT MESSAGE:")[-1].strip()
 
@@ -270,7 +264,7 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
     start_epoch = 0
     global_step = 0
     main_path = "data/"
-    # ΕΛΕΓΧΟΣ ΓΙΑ RESUME
+
     if os.path.exists(checkpoint_path):
         log_text(f"Loading checkpoint: {checkpoint_path}")
         checkpoint = torch.load(checkpoint_path)
@@ -341,7 +335,7 @@ def train(model, train_loader, val_loader, optimizer,scaler,scheduler, device, t
             "PPL": f"{ppl:.2f}"
         })
         progress_bar.refresh()
-        progress_bar.close() # Close bar to log_text new line
+        progress_bar.close() 
 
         # Logging
         log_text(f"Summary Epoch {epoch+1}: Train Loss: {train_loss:.4f}| Train Accuracy: {train_acc:.4f}\

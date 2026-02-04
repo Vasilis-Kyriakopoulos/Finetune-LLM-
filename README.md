@@ -1,4 +1,4 @@
-Instructions for Finetune-LLM
+#Instructions for Finetune-LLM
 
 ## Project Overview
 This project finetunes GPT-2 on code diffs to generate commit messages. The model learns the relationship between code changes and their corresponding commit messages using the CommitBench dataset (10% subset).
